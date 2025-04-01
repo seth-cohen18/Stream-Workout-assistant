@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Stream AI Workout Assistant</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+    header {
+      background-color: #333;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      background-color: #444;
+    }
+    nav a {
+      color: white;
+      padding: 14px 20px;
+      text-decoration: none;
+      text-align: center;
+    }
+    nav a:hover {
+      background-color: #ddd;
+      color: black;
+    }
+    .container {
+      padding: 20px;
+    }
+    .tab {
+      display: none;
+    }
+    .tab.active {
+      display: block;
+    }
+    .progress-bar {
+      margin-top: 20px;
+      background-color: #ddd;
+      border-radius: 25px;
+      padding: 5px;
+    }
+    .progress {
+      background-color: #4caf50;
+      width: 50%; /* Update dynamically with JS */
+      height: 20px;
+      border-radius: 25px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Stream AI Workout Assistant</h1>
+  </header>
+  <nav>
+    <a href="#workouts" class="tab-link" data-tab="workouts">Workouts</a>
+    <a href="#nutrition" class="tab-link" data-tab="nutrition">Nutrition</a>
+    <a href="#progress" class="tab-link" data-tab="progress">Progress</a>
+  </nav>
+  <div class="container">
+    <div id="workouts" class="tab active">
+      <h2>Workouts</h2>
+      <p>Select an exercise and start your workout!</p>
+      <button id="startExercise">Start Exercise</button>
+      <button id="endExercise">End Exercise</button>
+      <div id="videoFeed"></div>
+    </div>
+    <div id="nutrition" class="tab">
+      <h2>Nutrition</h2>
+      <p>Find healthy recipes and meal plans.</p>
+    </div>
+    <div id="progress" class="tab">
+      <h2>Progress</h2>
+      <p>Track your progress over time:</p>
+      <div class="progress-bar">
+        <div class="progress" id="xpBar"></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tabs = document.querySelectorAll(".tab-link");
+    const tabContents = document.querySelectorAll(".tab");
+    tabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        tabContents.forEach(content => content.classList.remove("active"));
+        document.getElementById(tab.dataset.tab).classList.add("active");
+      });
+    });
+  </script>
+</body>
+</html>
