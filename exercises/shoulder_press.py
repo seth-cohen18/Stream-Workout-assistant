@@ -1,4 +1,4 @@
-# exercises/pushups.py
+# exercises/shoulder_press.py
 import cv2
 import mediapipe as mp
 import math
@@ -6,21 +6,22 @@ import time
 from collections import defaultdict
 from core.pose_detector import PoseDetector
 
-class PushUpTracker:
+class ShoulderPressTracker:
     # Constants based on scientific measurements for proper form
-    EXTENDED_ELBOW_THRESHOLD = 160  # Fully extended elbow angle
-    PROPER_ELBOW_THRESHOLD = 90     # Elbow should bend to at least 90° or less
-    MIN_ELBOW_DROP = 15             # Minimal elbow angle drop to start rep
-    MIN_BODY_LINE = 160             # Body should remain straight (>160°)
-    
-    def __init__(self, thresholds=None):
+    EXTENDED_ELBOW_THRESHOLD = 160  # Fully extended elbow angle (top position)
+    STARTING_ELBOW_THRESHOLD = 90   # Elbow angle at starting position (90° or less)
+    MIN_ELBOW_RAISE = 15            # Minimal elbow angle increase to start rep
+    BACK_LEAN_THRESHOLD = 15        # Max back lean angle from vertical
+    ELBOW_FORWARD_THRESHOLD = 0.05  # Elbow should not move too far forward
+
+    def __init__(self):
         self.detector = PoseDetector()
-        self.thresholds = thresholds or {"max_elbow_angle": 90, "min_body_line": 160}
         self.rep_count = 0
-        self.in_pushup = False
-        self.baseline_elbow = None          # Baseline elbow angle when arms extended
-        self.lowest_elbow_angle = None      # Lowest elbow angle during rep
-        self.improper_body_line_flag = False  # Flag for improper body alignment
+        self.in_press = False
+        self.baseline_elbow = None           # Baseline elbow angle at starting position
+        self.highest_elbow_angle = None      # Highest elbow angle during rep
+        self.improper_back_lean_flag = False # Flag for excessive back lean
+        self.improper_elbow_forward_flag = False # Flag for improper elbow position
         self.start_time = None               # For timing the rep
         self.last_wait_time = 0
         self.rep_times = []
@@ -44,15 +45,13 @@ class PushUpTracker:
         
         # Check visibility of required landmarks
         required = [
-            self.detector.NOSE,
             self.detector.LEFT_SHOULDER, self.detector.LEFT_ELBOW, self.detector.LEFT_WRIST,
-            self.detector.LEFT_HIP, self.detector.LEFT_ANKLE,
             self.detector.RIGHT_SHOULDER, self.detector.RIGHT_ELBOW, self.detector.RIGHT_WRIST,
-            self.detector.RIGHT_HIP, self.detector.RIGHT_ANKLE
+            self.detector.LEFT_HIP, self.detector.RIGHT_HIP
         ]
         
         if not all(landmarks[idx].visibility > 0.5 for idx in required):
-            feedback = "Waiting for user... (full body required)"
+            feedback = "Waiting for user... (arms and upper body must be visible)"
             if current_time - self.last_wait_time >= 5:
                 self.last_wait_time = current_time
                 self.last_feedback = feedback
@@ -76,58 +75,70 @@ class PushUpTracker:
         
         current_elbow_angle = (left_elbow_angle + right_elbow_angle) / 2
         
-        # Check body alignment (should be straight line from head to heels)
-        left_body_line = self.detector.calculate_angle(
-            landmarks[self.detector.LEFT_SHOULDER],
-            landmarks[self.detector.LEFT_HIP],
-            landmarks[self.detector.LEFT_ANKLE]
+        # Check back alignment (should be straight)
+        left_spine_vertical = self.calculate_vertical_angle(
+            [landmarks[self.detector.LEFT_SHOULDER].x, landmarks[self.detector.LEFT_SHOULDER].y],
+            [landmarks[self.detector.LEFT_HIP].x, landmarks[self.detector.LEFT_HIP].y]
         )
         
-        right_body_line = self.detector.calculate_angle(
-            landmarks[self.detector.RIGHT_SHOULDER],
-            landmarks[self.detector.RIGHT_HIP],
-            landmarks[self.detector.RIGHT_ANKLE]
+        right_spine_vertical = self.calculate_vertical_angle(
+            [landmarks[self.detector.RIGHT_SHOULDER].x, landmarks[self.detector.RIGHT_SHOULDER].y],
+            [landmarks[self.detector.RIGHT_HIP].x, landmarks[self.detector.RIGHT_HIP].y]
         )
         
-        body_line_angle = (left_body_line + right_body_line) / 2
+        spine_vertical_angle = (left_spine_vertical + right_spine_vertical) / 2
         
-        # Update baseline when arms fully extended
-        if current_elbow_angle > self.EXTENDED_ELBOW_THRESHOLD:
+        # Check elbow position (should not move too far forward)
+        left_elbow_forward = landmarks[self.detector.LEFT_ELBOW].z < landmarks[self.detector.LEFT_SHOULDER].z - self.ELBOW_FORWARD_THRESHOLD
+        right_elbow_forward = landmarks[self.detector.RIGHT_ELBOW].z < landmarks[self.detector.RIGHT_SHOULDER].z - self.ELBOW_FORWARD_THRESHOLD
+        elbows_forward = left_elbow_forward or right_elbow_forward
+        
+        # Update baseline when arms at starting position
+        if current_elbow_angle <= self.STARTING_ELBOW_THRESHOLD and not self.in_press and self.highest_elbow_angle is None:
             self.baseline_elbow = current_elbow_angle
             
         # Rep Attempt Initiation
-        if not self.in_pushup and self.baseline_elbow is not None and (self.baseline_elbow - current_elbow_angle) > self.MIN_ELBOW_DROP:
-            self.in_pushup = True
+        if not self.in_press and self.baseline_elbow is not None and (current_elbow_angle - self.baseline_elbow) > self.MIN_ELBOW_RAISE:
+            self.in_press = True
             self.start_time = current_time
-            self.lowest_elbow_angle = current_elbow_angle
-            self.improper_body_line_flag = False
-            
+            self.highest_elbow_angle = current_elbow_angle
+            self.improper_back_lean_flag = False
+            self.improper_elbow_forward_flag = False
+            # exercises/shoulder_press.py (continued)
         feedback = ""
         rep_time = 0
         
-        # During the push-up
-        if self.in_pushup:
-            # Update lowest elbow angle
-            if current_elbow_angle < self.lowest_elbow_angle:
-                self.lowest_elbow_angle = current_elbow_angle
+        # During the shoulder press
+        if self.in_press:
+            # Update highest elbow angle during the press
+            if current_elbow_angle > self.highest_elbow_angle:
+                self.highest_elbow_angle = current_elbow_angle
                 
-            # Check for improper body alignment
-            if body_line_angle < self.MIN_BODY_LINE:
-                self.improper_body_line_flag = True
+            # Check for improper back lean
+            if spine_vertical_angle > self.BACK_LEAN_THRESHOLD:
+                self.improper_back_lean_flag = True
+                
+            # Check for improper elbow position
+            if elbows_forward:
+                self.improper_elbow_forward_flag = True
                 
             # Rep Completion Check
-            if current_elbow_angle > self.EXTENDED_ELBOW_THRESHOLD:
+            if current_elbow_angle <= self.STARTING_ELBOW_THRESHOLD:
                 rep_time = current_time - self.start_time
                 
                 issues = []
                 
-                # Check depth
-                if self.lowest_elbow_angle > self.PROPER_ELBOW_THRESHOLD:
-                    issues.append("Lower chest closer to ground!")
+                # Check full extension
+                if self.highest_elbow_angle < self.EXTENDED_ELBOW_THRESHOLD:
+                    issues.append("Extend arms fully overhead!")
                     
-                # Check body alignment
-                if self.improper_body_line_flag:
-                    issues.append("Keep body in straight line!")
+                # Check back posture
+                if self.improper_back_lean_flag:
+                    issues.append("Keep back straight, don't lean back!")
+                    
+                # Check elbow position
+                if self.improper_elbow_forward_flag:
+                    issues.append("Keep elbows out to sides, not forward!")
                     
                 if issues:
                     feedback = " ".join(issues)
@@ -138,8 +149,9 @@ class PushUpTracker:
                     self.rep_times.append(rep_time)
                     
                 # Reset for next rep
-                self.in_pushup = False
-                self.lowest_elbow_angle = None
+                self.in_press = False
+                self.highest_elbow_angle = None
+                self.baseline_elbow = current_elbow_angle
                 
         # Store feedback if it's new
         if feedback:
@@ -161,6 +173,15 @@ class PushUpTracker:
         cv2.putText(frame, rep_text, (text_x, text_y + 40), font, font_scale, text_color, thickness)
 
         return frame, self.last_feedback, self.rep_count, rep_time
+        
+    def calculate_vertical_angle(self, a, b):
+        """Calculate the angle between a vector and the vertical axis."""
+        dx = b[0] - a[0]
+        dy = b[1] - a[1]
+        
+        # Angle with vertical (y-axis)
+        radians = math.atan2(dx, dy)
+        return abs(radians * 180.0 / math.pi)
         
     def get_session_summary(self):
         # Calculate average rep time

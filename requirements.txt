@@ -2,3 +2,6 @@ opencv-python
 mediapipe
 pyttsx3
 matplotlib
+Flask
+numpy
+requests

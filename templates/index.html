@@ -62,11 +62,21 @@
       max-width: 1200px;
       margin: 0 auto;
     }
+    
+    .logo-title-container {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .app-logo {
+      width: 48px;
+      height: 48px;
+    }
 
     .app-title {
       font-size: 1.8rem;
       font-weight: 700;
-      margin-right: 20px;
     }
 
     .theme-toggle {
@@ -420,9 +430,15 @@
     .recipe-meta {
       display: flex;
       justify-content: space-between;
+      flex-wrap: wrap;
       font-size: 0.9rem;
       color: var(--text-color);
       opacity: 0.8;
+    }
+
+    .recipe-meta span {
+      margin-right: 10px;
+      margin-bottom: 5px;
     }
 
     .progress-container {
@@ -517,6 +533,20 @@
       padding: 5px 15px;
       border-radius: var(--border-radius);
       z-index: 10;
+    }
+    
+    .no-results {
+      padding: 20px;
+      text-align: center;
+      background-color: rgba(0, 0, 0, 0.05);
+      border-radius: var(--border-radius);
+    }
+    
+    .error-message {
+      padding: 15px;
+      background-color: rgba(231, 76, 60, 0.1);
+      border-left: 4px solid var(--accent-color);
+      border-radius: var(--border-radius);
     }
 
     @media (max-width: 768px) {
@@ -748,7 +778,10 @@
 <body>
   <header>
     <div class="header-content">
-      <h1 class="app-title">Stream AI Workout Assistant</h1>
+      <div class="logo-title-container">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIwIiBmaWxsPSIjMDAzYzc0Ii8+PGNpcmNsZSBjeD0iNTAiIGN5PSIzMCIgcj0iMTUiIGZpbGw9IiNlY2YwZjEiLz48cmVjdCB4PSI0MCIgeT0iNDUiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyNSIgZmlsbD0iI2VjZjBmMSIvPjxsaW5lIHgxPSIyNSIgeTE9IjUwIiB4Mj0iNzUiIHkyPSI1MCIgc3Ryb2tlPSIjZWNmMGYxIiBzdHJva2Utd2lkdGg9IjUiLz48bGluZSB4MT0iMjUiIHkxPSI0MCIgeDI9IjMwIiB5Mj0iNDAiIHN0cm9rZT0iI2VjZjBmMSIgc3Ryb2tlLXdpZHRoPSI1Ii8+PGxpbmUgeDE9IjI1IiB5MT0iNTAiIHgyPSIzMCIgeTI9IjUwIiBzdHJva2U9IiNlY2YwZjEiIHN0cm9rZS13aWR0aD0iNSIvPjxsaW5lIHgxPSIyNSIgeTE9IjYwIiB4Mj0iMzAiIHkyPSI2MCIgc3Ryb2tlPSIjZWNmMGYxIiBzdHJva2Utd2lkdGg9IjUiLz48bGluZSB4MT0iNzAiIHkxPSI0MCIgeDI9Ijc1IiB5Mj0iNDAiIHN0cm9rZT0iI2VjZjBmMSIgc3Ryb2tlLXdpZHRoPSI1Ii8+PGxpbmUgeDE9IjcwIiB5MT0iNTAiIHgyPSI3NSIgeTI9IjUwIiBzdHJva2U9IiNlY2YwZjEiIHN0cm9rZS13aWR0aD0iNSIvPjxsaW5lIHgxPSI3MCIgeTE9IjYwIiB4Mj0iNzUiIHkyPSI2MCIgc3Ryb2tlPSIjZWNmMGYxIiBzdHJva2Utd2lkdGg9IjUiLz48bGluZSB4MT0iNDAiIHkxPSI3MCIgeDI9IjQwIiB5Mj0iODUiIHN0cm9rZT0iI2VjZjBmMSIgc3Ryb2tlLXdpZHRoPSI1Ii8+PGxpbmUgeDE9IjYwIiB5MT0iNzAiIHgyPSI2MCIgeTI9Ijg1IiBzdHJva2U9IiNlY2YwZjEiIHN0cm9rZS13aWR0aD0iNSIvPjwvc3ZnPg==" alt="Stream AI Workout Assistant Logo" class="app-logo">
+        <h1 class="app-title">Stream AI Workout Assistant</h1>
+      </div>
       <div class="profile-summary">
         <div class="profile-pic">
           <i class="fas fa-user"></i>
@@ -786,7 +819,7 @@
             <div class="exercise-option" data-exercise="Squats">Squats</div>
             <div class="exercise-option" data-exercise="Bicep Curls">Bicep Curls</div>
             <div class="exercise-option" data-exercise="Push-Ups">Push-Ups</div>
-            <div class="exercise-option" data-exercise="Planks">Planks</div>
+            <div class="exercise-option" data-exercise="Shoulder Press">Shoulder Press</div>
             <div class="exercise-option" data-exercise="Lunges">Lunges</div>
           </div>
         </div>
@@ -878,7 +911,22 @@
               </div>
             </div>
             <div class="ingredient-tags" id="ingredientTags"></div>
-            <button id="searchRecipesBtn" class="button"><i class="fas fa-search"></i> Find Recipes</button>
+            
+            <div class="form-group" style="margin-top: 15px;">
+              <label>Search for recipes that use:</label>
+              <div style="display: flex; gap: 20px; margin-top: 5px;">
+                <label style="display: flex; align-items: center; cursor: pointer;">
+                  <input type="radio" name="searchType" id="searchWithAll" checked>
+                  <span style="margin-left: 8px;">All my ingredients</span>
+                </label>
+                <label style="display: flex; align-items: center; cursor: pointer;">
+                  <input type="radio" name="searchType" id="searchWithAny">
+                  <span style="margin-left: 8px;">Any of my ingredients</span>
+                </label>
+              </div>
+            </div>
+            
+            <button id="searchRecipesBtn" class="button" style="margin-top: 15px;"><i class="fas fa-search"></i> Find Recipes</button>
           </div>
           
           <div id="recipesLoading" class="hidden">
@@ -929,8 +977,8 @@
                 <div class="stat-label">Push-Ups</div>
               </div>
               <div class="stat-card">
-                <div class="stat-value" id="PlanksCount">0</div>
-                <div class="stat-label">Planks</div>
+                <div class="stat-value" id="ShoulderPressCount">0</div>
+                <div class="stat-label">Shoulder Press</div>
               </div>
               <div class="stat-card">
                 <div class="stat-value" id="LungesCount">0</div>
@@ -1057,19 +1105,19 @@
           difficulty: 'intermediate',
           muscles: ['Chest', 'Shoulders', 'Triceps', 'Core']
         },
-        'Planks': {
-          description: 'An isometric core exercise that builds endurance and stability.',
+        'Shoulder Press': {
+          description: 'A compound movement that targets the deltoids and strengthens shoulder stability.',
           steps: [
-            'Start in a forearm plank position with elbows directly beneath shoulders',
-            'Keep your body in a straight line from head to heels',
-            'Engage your core by pulling your navel toward your spine',
-            'Keep your shoulders down and back, not hunched',
-            'Hold this position while breathing normally',
-            'Maintain proper form throughout the duration'
+            'Sit or stand with your back straight and core engaged',
+            'Hold dumbbells at shoulder height with palms facing forward',
+            'Push the weights upward until your arms are fully extended overhead',
+            'Pause briefly at the top of the movement',
+            'Slowly lower the weights back to the starting position at shoulder level',
+            'Maintain control throughout the entire movement'
           ],
-          science: 'Planks activate the transverse abdominis, the deepest layer of abdominal muscles, which is essential for spine protection and core stability. Isometric contractions improve muscular endurance without spinal flexion.',
-          difficulty: 'beginner',
-          muscles: ['Core', 'Shoulders', 'Back', 'Glutes']
+          science: 'The shoulder press effectively targets all three deltoid heads, particularly emphasizing the anterior and lateral portions. It also engages stabilizer muscles in the rotator cuff, promoting shoulder joint integrity and reducing injury risk when performed with proper form.',
+          difficulty: 'intermediate',
+          muscles: ['Deltoids', 'Triceps', 'Trapezius', 'Core']
         },
         'Lunges': {
           description: 'A unilateral exercise that targets the quadriceps, hamstrings, and glutes.',
@@ -1261,7 +1309,7 @@
           'Squats': 0.32,
           'Bicep Curls': 0.15,
           'Push-Ups': 0.29,
-          'Planks': 0.05, // per second
+          'Shoulder Press': 0.20,
           'Lunges': 0.3
         };
         
@@ -1399,7 +1447,7 @@
         'Squats': 0.32,
         'Bicep Curls': 0.15,
         'Push-Ups': 0.29,
-        'Planks': 0.05, // per second
+        'Shoulder Press': 0.20,
         'Lunges': 0.3
       };
       
@@ -1506,16 +1554,21 @@
       }
     });
     
-    // Nutrition tab functionality
+    // Nutrition tab functionality with real Spoonacular API integration
     const ingredientInput = document.getElementById('ingredientInput');
     const addIngredientBtn = document.getElementById('addIngredientBtn');
     const ingredientTags = document.getElementById('ingredientTags');
     const searchRecipesBtn = document.getElementById('searchRecipesBtn');
     const recipeResults = document.getElementById('recipeResults');
     const recipesLoading = document.getElementById('recipesLoading');
-    
+    const searchWithAllRadio = document.getElementById('searchWithAll');
+    const searchWithAnyRadio = document.getElementById('searchWithAny');
+
+    // Your Spoonacular API key - replace with your actual API key
+    const SPOONACULAR_API_KEY = 'YOUR_SPOONACULAR_API_KEY';
+
     let ingredients = [];
-    
+
     // Add ingredient to the list
     function addIngredient() {
       const ingredient = ingredientInput.value.trim();
@@ -1525,7 +1578,7 @@
         ingredientInput.value = '';
       }
     }
-    
+
     // Update ingredient tags display
     function updateIngredientTags() {
       ingredientTags.innerHTML = '';
@@ -1545,18 +1598,18 @@
         });
       });
     }
-    
+
     // Add ingredient when clicking Add button
     addIngredientBtn.addEventListener('click', addIngredient);
-    
+
     // Add ingredient when pressing Enter
     ingredientInput.addEventListener('keyup', function(e) {
       if (e.key === 'Enter') {
         addIngredient();
       }
     });
-    
-    // Search for recipes
+
+    // Search for recipes using Spoonacular API
     searchRecipesBtn.addEventListener('click', async function() {
       if (ingredients.length === 0) {
         alert('Please add at least one ingredient');
@@ -1567,139 +1620,196 @@
       recipesLoading.classList.remove('hidden');
       recipeResults.innerHTML = '';
       
-      // In a real implementation, you would call an API like Spoonacular
-      // For this demo, we'll simulate API response with sample data
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Determine search type based on radio button selection
+      const searchType = searchWithAllRadio.checked ? 'all' : 'any';
       
-      // Sample recipe data
-      const recipes = [
-        {
-          id: 1,
-          title: 'Chicken & Vegetable Stir Fry',
-          image: 'https://spoonacular.com/recipeImages/632583-556x370.jpg',
-          readyInMinutes: 30,
-          calories: 320,
-          protein: 28
-        },
-        {
-          id: 2,
-          title: 'Protein-Packed Quinoa Bowl',
-          image: 'https://spoonacular.com/recipeImages/642585-556x370.jpg',
-          readyInMinutes: 25,
-          calories: 380,
-          protein: 15
-        },
-        {
-          id: 3,
-          title: 'Greek Yogurt Parfait',
-          image: 'https://spoonacular.com/recipeImages/642605-556x370.jpg',
-          readyInMinutes: 10,
-          calories: 210,
-          protein: 18
-        },
-        {
-          id: 4,
-          title: 'Salmon with Roasted Vegetables',
-          image: 'https://spoonacular.com/recipeImages/659135-556x370.jpg',
-          readyInMinutes: 35,
-          calories: 420,
-          protein: 32
-        }
-      ];
-      
-      // Display recipes
-      recipes.forEach(recipe => {
-        const recipeCard = document.createElement('div');
-        recipeCard.className = 'recipe-card';
-        recipeCard.setAttribute('data-id', recipe.id);
+      try {
+        // Format ingredients for API
+        const ingredientsList = ingredients.join(',+');
+        let apiUrl;
         
-        recipeCard.innerHTML = `
-          <img src="${recipe.image}" alt="${recipe.title}" class="recipe-image">
-          <div class="recipe-content">
-            <h3 class="recipe-title">${recipe.title}</h3>
-            <div class="recipe-meta">
-              <span><i class="far fa-clock"></i> ${recipe.readyInMinutes} min</span>
-              <span><i class="fas fa-fire"></i> ${recipe.calories} cal</span>
-              <span><i class="fas fa-drumstick-bite"></i> ${recipe.protein}g protein</span>
+        if (searchType === 'all') {
+          // Search recipes with ALL ingredients
+          apiUrl = `https://api.spoonacular.com/recipes/findByIngredients?ingredients=${ingredientsList}&number=12&ranking=1&apiKey=${SPOONACULAR_API_KEY}`;
+        } else {
+          // Search recipes with ANY of the ingredients
+          apiUrl = `https://api.spoonacular.com/recipes/complexSearch?includeIngredients=${ingredientsList}&number=12&addRecipeInformation=true&apiKey=${SPOONACULAR_API_KEY}`;
+        }
+        
+        const response = await fetch(apiUrl);
+        
+        if (!response.ok) {
+          throw new Error('API request failed');
+        }
+        
+        let recipes = await response.json();
+        
+        // Format response depending on endpoint used
+        if (searchType === 'any') {
+          recipes = recipes.results;
+        }
+        
+        if (recipes.length === 0) {
+          recipeResults.innerHTML = `<div class="no-results">No recipes found with your ingredients. Try adding more ingredients or changing your search option.</div>`;
+        } else {
+          // Display recipes
+          recipes.forEach(recipe => {
+            const recipeCard = document.createElement('div');
+            recipeCard.className = 'recipe-card';
+            recipeCard.setAttribute('data-id', recipe.id);
+            
+            // Get image URL (different based on endpoint)
+            const imageUrl = recipe.image;
+            
+            // Get ready in minutes (if available)
+            const readyInMinutes = recipe.readyInMinutes || 'N/A';
+            
+            recipeCard.innerHTML = `
+              <img src="${imageUrl}" alt="${recipe.title}" class="recipe-image">
+              <div class="recipe-content">
+                <h3 class="recipe-title">${recipe.title}</h3>
+                <div class="recipe-meta">
+                  <span><i class="far fa-clock"></i> ${readyInMinutes} min</span>
+                  ${searchType === 'all' ? `<span><i class="fas fa-list-check"></i> ${recipe.usedIngredientCount} of your ingredients</span>` : ''}
+                  <span><i class="fas fa-utensils"></i> View Details</span>
+                </div>
+              </div>
+            `;
+            
+            recipeResults.appendChild(recipeCard);
+            
+            // Add click event to view recipe details
+            recipeCard.addEventListener('click', () => {
+              fetchAndShowRecipeDetails(recipe.id);
+            });
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching recipes:', error);
+        recipeResults.innerHTML = `<div class="error-message">Error fetching recipes. Please try again later.</div>`;
+      } finally {
+        // Hide loading indicator
+        recipesLoading.classList.add('hidden');
+      }
+    });
+
+    // Fetch detailed recipe information and show in modal
+    async function fetchAndShowRecipeDetails(recipeId) {
+      try {
+        // Show loading in modal
+        recipeModalTitle.textContent = 'Loading Recipe Details...';
+        recipeModalBody.innerHTML = '<div class="loader"></div>';
+        recipeModal.classList.add('active');
+        
+        // Fetch detailed recipe information
+        const apiUrl = `https://api.spoonacular.com/recipes/${recipeId}/information?includeNutrition=true&apiKey=${SPOONACULAR_API_KEY}`;
+        const response = await fetch(apiUrl);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch recipe details');
+        }
+        
+        const recipe = await response.json();
+        
+        // Update modal with recipe details
+        recipeModalTitle.textContent = recipe.title;
+        
+        // Format ingredients list
+        let ingredientsList = '<ul class="form-cue-list">';
+        recipe.extendedIngredients.forEach(ingredient => {
+          ingredientsList += `<li>${ingredient.original}</li>`;
+        });
+        ingredientsList += '</ul>';
+        
+        // Format instructions
+        let instructions = '';
+        if (recipe.analyzedInstructions && recipe.analyzedInstructions.length > 0) {
+          instructions = '<ol style="margin-left: 20px;">';
+          recipe.analyzedInstructions[0].steps.forEach(step => {
+            instructions += `<li>${step.step}</li>`;
+          });
+          instructions += '</ol>';
+        } else if (recipe.instructions) {
+          instructions = `<p>${recipe.instructions}</p>`;
+        } else {
+          instructions = '<p>No instructions available for this recipe.</p>';
+        }
+        
+        // Get basic nutrition info
+        let nutritionInfo = '';
+        let calories = {amount: 0};
+        let protein = {amount: 0};
+        
+        if (recipe.nutrition && recipe.nutrition.nutrients) {
+          calories = recipe.nutrition.nutrients.find(n => n.name === "Calories") || {amount: 0};
+          protein = recipe.nutrition.nutrients.find(n => n.name === "Protein") || {amount: 0};
+          const carbs = recipe.nutrition.nutrients.find(n => n.name === "Carbohydrates") || {amount: 0};
+          const fat = recipe.nutrition.nutrients.find(n => n.name === "Fat") || {amount: 0};
+          
+          nutritionInfo = `
+            <div class="recipe-stats" style="display: flex; gap: 15px; margin-bottom: 15px;">
+              <div class="stat-card">
+                <div class="stat-value">${Math.round(calories.amount)}</div>
+                <div class="stat-label">Calories</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">${Math.round(protein.amount)}g</div>
+                <div class="stat-label">Protein</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">${Math.round(carbs.amount)}g</div>
+                <div class="stat-label">Carbs</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">${Math.round(fat.amount)}g</div>
+                <div class="stat-label">Fat</div>
+              </div>
             </div>
+          `;
+        }
+        
+        // Construct modal body
+        recipeModalBody.innerHTML = `
+          <img src="${recipe.image}" alt="${recipe.title}" style="width: 100%; border-radius: var(--border-radius); margin-bottom: 15px;">
+          
+          ${nutritionInfo}
+          
+          <div class="recipe-meta" style="margin-bottom: 15px;">
+            <span><i class="far fa-clock"></i> ${recipe.readyInMinutes} minutes</span>
+            <span><i class="fas fa-users"></i> ${recipe.servings} servings</span>
+            ${recipe.sourceName ? `<span><i class="fas fa-globe"></i> Source: ${recipe.sourceName}</span>` : ''}
+          </div>
+          
+          <h4>Ingredients</h4>
+          ${ingredientsList}
+          
+          <h4>Instructions</h4>
+          ${instructions}
+          
+          <h4>Nutrition Facts</h4>
+          <div class="science-callout">
+            <p>This recipe contains approximately ${Math.round(calories.amount)} calories per serving with ${Math.round(protein.amount)}g of protein to support muscle recovery and growth.</p>
+            ${recipe.veryHealthy ? '<p><strong>Health Benefit:</strong> This recipe is considered very healthy by nutrition standards.</p>' : ''}
           </div>
         `;
         
-        recipeResults.appendChild(recipeCard);
-        
-        // Add click event to view recipe details
-        recipeCard.addEventListener('click', () => {
-          showRecipeDetails(recipe);
-        });
-      });
-      
-      // Hide loading indicator
-      recipesLoading.classList.add('hidden');
-    });
-    
+      } catch (error) {
+        console.error('Error fetching recipe details:', error);
+        recipeModalBody.innerHTML = `<div class="error-message">Error loading recipe details. Please try again later.</div>`;
+      }
+    }
+
     // Recipe modal
     const recipeModal = document.getElementById('recipeModal');
     const recipeModalTitle = document.getElementById('recipeModalTitle');
     const recipeModalBody = document.getElementById('recipeModalBody');
     const modalClose = document.querySelector('.modal-close');
-    
-    // Show recipe details in modal
-    function showRecipeDetails(recipe) {
-      recipeModalTitle.textContent = recipe.title;
-      
-      // In a real implementation, you would fetch detailed recipe data
-      // For this demo, we'll use sample data
-      recipeModalBody.innerHTML = `
-        <img src="${recipe.image}" alt="${recipe.title}" style="width: 100%; border-radius: var(--border-radius); margin-bottom: 15px;">
-        
-        <div class="recipe-stats" style="display: flex; gap: 15px; margin-bottom: 15px;">
-          <div class="stat-card">
-            <div class="stat-value">${recipe.readyInMinutes}</div>
-            <div class="stat-label">Minutes</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value">${recipe.calories}</div>
-            <div class="stat-label">Calories</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value">${recipe.protein}g</div>
-            <div class="stat-label">Protein</div>
-          </div>
-        </div>
-        
-        <h4>Ingredients</h4>
-        <ul class="form-cue-list">
-          <li>4 oz protein (chicken, tofu, etc.)</li>
-          <li>1 cup mixed vegetables</li>
-          <li>2 tbsp olive oil</li>
-          <li>Herbs and spices to taste</li>
-          <li>1/2 cup grain (rice, quinoa, etc.)</li>
-        </ul>
-        
-        <h4>Instructions</h4>
-        <ol style="margin-left: 20px;">
-          <li>Prepare your protein and vegetables.</li>
-          <li>Heat oil in a pan over medium-high heat.</li>
-          <li>Cook protein until done, then set aside.</li>
-          <li>Add vegetables to the pan and cook until tender.</li>
-          <li>Combine with cooked grain and protein.</li>
-          <li>Season to taste and serve warm.</li>
-        </ol>
-        
-        <h4>Nutrition Facts</h4>
-        <div class="science-callout">
-          <p>This balanced meal provides essential macronutrients to support your workout recovery. The protein helps repair muscle tissue, while complex carbohydrates restore glycogen stores. The healthy fats support hormone production and nutrient absorption.</p>
-        </div>
-      `;
-      
-      recipeModal.classList.add('active');
-    }
-    
+
     // Close modal when clicking X
     modalClose.addEventListener('click', () => {
       recipeModal.classList.remove('active');
     });
-    
+
     // Close modal when clicking outside
     window.addEventListener('click', (e) => {
       if (e.target === recipeModal) {

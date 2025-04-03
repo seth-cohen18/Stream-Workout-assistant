@@ -1,14 +1,17 @@
 # exercises/bicep_curls.py
+import cv2
+import mediapipe as mp
+import math
 import time
+from collections import defaultdict
 from core.pose_detector import PoseDetector
 
 class BicepCurlTracker:
-    EXTENDED_THRESHOLD = 160    # Fully extended angle.
-    MIN_DROP = 5                # Minimal drop to start rep.
-    MIN_CONTRACTION_REQUIRED = 15  # Required contraction amount.
-    WARN_CURL_THRESHOLD = 35    # If min angle > 35°, prompt to curl higher.
-    PROPER_CURL_THRESHOLD = 30  # If min angle > 30 and <=35, prompt "Almost there".
-    BODY_ANGLE_LIMIT = 15       # Elbow-to-body must be less than 15°.
+    # Constants based on scientific measurements for proper form
+    EXTENDED_THRESHOLD = 160    # Fully extended angle
+    ELBOW_CONTRACT_THRESHOLD = 45  # For a proper curl, the lowest elbow angle must drop below this
+    MIN_DROP = 10               # Minimal drop to start rep
+    ELBOW_BODY_ANGLE_THRESHOLD = 15  # Elbow-to-body must be less than 15°
 
     def __init__(self):
         self.detector = PoseDetector()
@@ -19,104 +22,161 @@ class BicepCurlTracker:
         self.improper_flag = False
         self.start_time = None
         self.last_wait_time = 0
+        self.rep_times = []
+        self.feedback_history = []
+        self.last_feedback = "Waiting for user..."
+        self.rep_time_intervals = defaultdict(int)
 
     def track(self, frame):
         results = self.detector.process_frame(frame)
         current_time = time.time()
+        
         if not (results and results.pose_landmarks):
             feedback = ""
             if current_time - self.last_wait_time >= 5:
-                feedback = "Waiting for user to be fully in frame..."
+                feedback = "Waiting for user..."
                 self.last_wait_time = current_time
-            self.in_rep = False
-            return frame, feedback, self.rep_count, 0
+                self.last_feedback = feedback
+            return frame, self.last_feedback, self.rep_count, 0
 
         landmarks = results.pose_landmarks.landmark
-        required = [
-            self.detector.LEFT_SHOULDER, self.detector.LEFT_ELBOW,
-            self.detector.LEFT_WRIST, self.detector.LEFT_HIP,
-            self.detector.RIGHT_SHOULDER, self.detector.RIGHT_ELBOW,
-            self.detector.RIGHT_WRIST, self.detector.RIGHT_HIP
-        ]
-        if not all(landmarks[idx].visibility > 0.5 for idx in required):
-            feedback = ""
+
+        # Check visibility for both arms
+        left_available = (
+            landmarks[self.detector.LEFT_SHOULDER].visibility > 0.5 and
+            landmarks[self.detector.LEFT_ELBOW].visibility > 0.5 and
+            landmarks[self.detector.LEFT_WRIST].visibility > 0.5 and
+            landmarks[self.detector.LEFT_HIP].visibility > 0.5
+        )
+        
+        right_available = (
+            landmarks[self.detector.RIGHT_SHOULDER].visibility > 0.5 and
+            landmarks[self.detector.RIGHT_ELBOW].visibility > 0.5 and
+            landmarks[self.detector.RIGHT_WRIST].visibility > 0.5 and
+            landmarks[self.detector.RIGHT_HIP].visibility > 0.5
+        )
+
+        if not (left_available or right_available):
+            feedback = "Waiting for user..."
             if current_time - self.last_wait_time >= 5:
-                feedback = "Waiting for user to be fully in frame (arms must be visible)..."
                 self.last_wait_time = current_time
-            self.in_rep = False
-            return frame, feedback, self.rep_count, 0
+                self.last_feedback = feedback
+            return frame, self.last_feedback, self.rep_count, 0
 
-        # Define helper to compute side’s angles.
-        def compute_side(side):
-            if side == "left":
-                shoulder = landmarks[self.detector.LEFT_SHOULDER]
-                elbow = landmarks[self.detector.LEFT_ELBOW]
-                wrist = landmarks[self.detector.LEFT_WRIST]
-                hip = landmarks[self.detector.LEFT_HIP]
-            else:
-                shoulder = landmarks[self.detector.RIGHT_SHOULDER]
-                elbow = landmarks[self.detector.RIGHT_ELBOW]
-                wrist = landmarks[self.detector.RIGHT_WRIST]
-                hip = landmarks[self.detector.RIGHT_HIP]
-            curl_angle = self.detector.calculate_angle(shoulder, elbow, wrist)
-            body_angle = self.detector.calculate_angle(hip, shoulder, elbow)
-            return curl_angle, body_angle
-
-        left_visible = all(landmarks[idx].visibility > 0.5 for idx in 
-                             [self.detector.LEFT_SHOULDER, self.detector.LEFT_ELBOW, self.detector.LEFT_WRIST, self.detector.LEFT_HIP])
-        right_visible = all(landmarks[idx].visibility > 0.5 for idx in 
-                              [self.detector.RIGHT_SHOULDER, self.detector.RIGHT_ELBOW, self.detector.RIGHT_WRIST, self.detector.RIGHT_HIP])
-        if left_visible and right_visible:
-            left_curl, left_body = compute_side("left")
-            right_curl, right_body = compute_side("right")
-            current_curl = (left_curl + right_curl) / 2.0
-            body_angle = (left_body + right_body) / 2.0
-        elif left_visible:
-            current_curl, body_angle = compute_side("left")
-        elif right_visible:
-            current_curl, body_angle = compute_side("right")
+        # Prefer left side if available
+        if left_available:
+            shoulder = landmarks[self.detector.LEFT_SHOULDER]
+            elbow = landmarks[self.detector.LEFT_ELBOW]
+            wrist = landmarks[self.detector.LEFT_WRIST]
+            hip = landmarks[self.detector.LEFT_HIP]
         else:
-            feedback = ""
-            if current_time - self.last_wait_time >= 5:
-                feedback = "Waiting for user to be fully in frame (arms must be visible)..."
-                self.last_wait_time = current_time
-            self.in_rep = False
-            return frame, feedback, self.rep_count, 0
+            shoulder = landmarks[self.detector.RIGHT_SHOULDER]
+            elbow = landmarks[self.detector.RIGHT_ELBOW]
+            wrist = landmarks[self.detector.RIGHT_WRIST]
+            hip = landmarks[self.detector.RIGHT_HIP]
 
-        if current_curl > self.EXTENDED_THRESHOLD:
-            self.baseline = current_curl
-
-        if not self.in_rep and self.baseline is not None:
-            if (self.baseline - current_curl) >= self.MIN_DROP:
-                self.in_rep = True
-                self.start_time = current_time
-                self.min_angle = current_curl
-                self.improper_flag = False
-
+        if self.last_feedback == "Waiting for user...":
+            self.last_feedback = "Begin exercise."
+            
+        # Calculate the current elbow angle
+        current_elbow_angle = self.detector.calculate_angle(shoulder, elbow, wrist)
+        
+        # Update baseline if arm is fully extended
+        if current_elbow_angle > self.EXTENDED_THRESHOLD:
+            self.baseline = current_elbow_angle
+            
+        # Rep Attempt Initiation
+        if not self.in_rep and self.baseline is not None and (self.baseline - current_elbow_angle) > self.MIN_DROP:
+            self.in_rep = True
+            self.start_time = current_time
+            self.min_angle = current_elbow_angle
+            self.improper_flag = False  # Reset improper flag at rep start
+            
+        feedback = ""
+        rep_time = 0
+        
+        # During the rep
         if self.in_rep:
-            if current_curl < self.min_angle:
-                self.min_angle = current_curl
-            if body_angle >= self.BODY_ANGLE_LIMIT:
+            # Update lowest elbow angle
+            if current_elbow_angle < self.min_angle:
+                self.min_angle = current_elbow_angle
+                
+            # Check elbow-to-body alignment
+            vec_SE = [elbow.x - shoulder.x, elbow.y - shoulder.y]
+            vec_SH = [hip.x - shoulder.x, hip.y - shoulder.y]
+            elbow_body_angle = self.calculate_vector_angle(vec_SE, vec_SH)
+            
+            if elbow_body_angle > self.ELBOW_BODY_ANGLE_THRESHOLD:
                 self.improper_flag = True
-            if current_curl > self.EXTENDED_THRESHOLD:
+                
+            # Rep Completion Check
+            if current_elbow_angle > self.EXTENDED_THRESHOLD:
                 rep_time = current_time - self.start_time
-                contraction = self.baseline - self.min_angle
-                feedback = ""
-                if contraction < self.MIN_CONTRACTION_REQUIRED:
-                    if self.min_angle > self.WARN_CURL_THRESHOLD:
-                        feedback = "Curl higher! Your curl isn't high enough."
-                    elif self.min_angle > self.PROPER_CURL_THRESHOLD:
-                        feedback = "Almost there, try curling a bit more."
-                    else:
-                        feedback = "Adjust your form!"
+                issues = []
+                
+                # Check curl depth
+                if self.min_angle > self.ELBOW_CONTRACT_THRESHOLD:
+                    issues.append("Curl further!")
+                    
+                # Check elbow position
                 if self.improper_flag:
-                    if feedback:
-                        feedback += " Keep your elbows close to your body!"
-                    else:
-                        feedback = "Keep your elbows close to your body!"
-                if feedback == "":
+                    issues.append("Keep your elbows close to your body!")
+                    
+                if issues:
+                    feedback = " ".join(issues)
+                else:
                     self.rep_count += 1
+                    rounded_time = round(rep_time * 2) / 2
+                    self.rep_time_intervals[rounded_time] += 1
+                    self.rep_times.append(rep_time)
+                    
+                # Reset for next rep
                 self.in_rep = False
-                return frame, feedback, self.rep_count, rep_time
+                self.min_angle = None
+                self.baseline = current_elbow_angle
+                
+        # Store feedback if it's new
+        if feedback:
+            self.last_feedback = feedback
+            if not feedback.startswith("Waiting"):
+                self.feedback_history.append(feedback)
+        
+        # Overlay information on the frame
+        text_x, text_y = 50, 50
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        font_scale = 1
+        text_color = (255, 255, 255)
+        thickness = 2
 
-        return frame, "", self.rep_count, 0
+        cv2.putText(frame, self.last_feedback, (text_x, text_y), font, font_scale, (0, 0, 0), thickness * 4)
+        cv2.putText(frame, self.last_feedback, (text_x, text_y), font, font_scale, text_color, thickness)
+        rep_text = f"Reps: {self.rep_count}"
+        cv2.putText(frame, rep_text, (text_x, text_y + 40), font, font_scale, (0, 0, 0), thickness * 4)
+        cv2.putText(frame, rep_text, (text_x, text_y + 40), font, font_scale, text_color, thickness)
+
+        return frame, self.last_feedback, self.rep_count, rep_time
+        
+    def calculate_vector_angle(self, v1, v2):
+        """Calculate the angle (in degrees) between two 2D vectors v1 and v2."""
+        dot = v1[0]*v2[0] + v1[1]*v2[1]
+        mag1 = math.sqrt(v1[0]**2 + v1[1]**2)
+        mag2 = math.sqrt(v2[0]**2 + v2[1]**2)
+        if mag1 == 0 or mag2 == 0:
+            return 0
+        cos_val = dot / (mag1 * mag2)
+        cos_val = max(min(cos_val, 1.0), -1.0)
+        return math.degrees(math.acos(cos_val))
+        
+    def get_session_summary(self):
+        # Calculate average rep time
+        avg_rep_time = 0
+        if self.rep_times:
+            avg_rep_time = sum(self.rep_times) / len(self.rep_times)
+            
+        return {
+            "total_reps": self.rep_count,
+            "rep_times": self.rep_times,
+            "average_rep_time": avg_rep_time,
+            "feedback": self.feedback_history,
+            "rep_time_intervals": dict(self.rep_time_intervals)
+        }
