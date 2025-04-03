@@ -1,0 +1,239 @@
+/* Dark Mode Styles */
+:root {
+    /* Light Theme Variables */
+    --primary-color: #003c74;
+    --secondary-color: #3498db;
+    --accent-color: #27ae60;
+    --danger-color: #e74c3c;
+    --background-color: #f8f9fa;
+    --card-bg-color: #ffffff;
+    --border-color: #dee2e6;
+    --text-color: #333;
+    --text-muted: #6c757d;
+    --input-bg: #ffffff;
+    --chart-bg: #f8f9fa;
+    --progress-bg: #e9ecef;
+    --tooltip-bg: rgba(0, 0, 0, 0.7);
+    --shadow-color: rgba(0, 0, 0, 0.05);
+    --overlay-bg: rgba(0, 0, 0, 0.5);
+}
+
+/* Dark Theme Variables */
+[data-theme="dark"] {
+    --primary-color: #0056b3;
+    --secondary-color: #4fa8e0;
+    --accent-color: #2ecc71;
+    --danger-color: #e74c3c;
+    --background-color: #121212;
+    --card-bg-color: #1e1e1e;
+    --border-color: #343a40;
+    --text-color: #f8f9fa;
+    --text-muted: #adb5bd;
+    --input-bg: #2d2d2d;
+    --chart-bg: #2d2d2d;
+    --progress-bg: #343a40;
+    --tooltip-bg: rgba(255, 255, 255, 0.15);
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --overlay-bg: rgba(0, 0, 0, 0.7);
+}
+
+/* Apply theme variables to elements */
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+.card {
+    background-color: var(--card-bg-color);
+    border-color: var(--border-color);
+    box-shadow: 0 2px 10px var(--shadow-color);
+}
+
+.card-header {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.card-body {
+    background-color: var(--card-bg-color);
+}
+
+.list-group-item {
+    background-color: var(--card-bg-color);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+.modal-content {
+    background-color: var(--card-bg-color);
+    color: var(--text-color);
+}
+
+.modal-header, .modal-footer {
+    border-color: var(--border-color);
+}
+
+.form-control, .form-select {
+    background-color: var(--input-bg);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: var(--input-bg);
+    color: var(--text-color);
+}
+
+.form-text {
+    color: var(--text-muted);
+}
+
+.overlay-message {
+    background-color: var(--overlay-bg);
+}
+
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.chart-container {
+    background-color: var(--chart-bg);
+}
+
+.stats-container {
+    background-color: var(--card-bg-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+.feedback-box {
+    background-color: rgba(52, 152, 219, 0.1);
+    border-left: 4px solid var(--secondary-color);
+}
+
+.ingredient-tag {
+    background-color: var(--progress-bg);
+    color: var(--text-color);
+}
+
+.progress {
+    background-color: var(--progress-bg);
+}
+
+/* Dark mode toggle styles */
+.theme-switch-wrapper {
+    display: flex;
+    align-items: center;
+    margin-left: 15px;
+}
+
+.theme-switch {
+    display: inline-block;
+    height: 24px;
+    position: relative;
+    width: 48px;
+}
+
+.theme-switch input {
+    display: none;
+}
+
+.slider {
+    background-color: #ccc;
+    bottom: 0;
+    cursor: pointer;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    background-color: white;
+    bottom: 4px;
+    content: "";
+    height: 16px;
+    left: 4px;
+    position: absolute;
+    transition: .4s;
+    width: 16px;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--accent-color);
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
+}
+
+.slider-icons {
+    color: white;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    font-size: 10px;
+}
+
+.slider-icons.sun {
+    left: 30%;
+}
+
+.slider-icons.moon {
+    left: 70%;
+}
+
+/* Additional dark mode specific adjustments */
+[data-theme="dark"] .bg-light {
+    background-color: var(--card-bg-color) !important;
+}
+
+[data-theme="dark"] .text-muted {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .table {
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .alert-info {
+    background-color: rgba(52, 152, 219, 0.2);
+    border-color: rgba(52, 152, 219, 0.3);
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .alert-warning {
+    background-color: rgba(243, 156, 18, 0.2);
+    border-color: rgba(243, 156, 18, 0.3);
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .alert-success {
+    background-color: rgba(46, 204, 113, 0.2);
+    border-color: rgba(46, 204, 113, 0.3);
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .alert-danger {
+    background-color: rgba(231, 76, 60, 0.2);
+    border-color: rgba(231, 76, 60, 0.3);
+    color: var(--text-color);
+}
+
+/* Fix contrast issues in dark mode */
+[data-theme="dark"] .badge.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+
+[data-theme="dark"] .badge.bg-secondary {
+    background-color: var(--secondary-color) !important;
+}

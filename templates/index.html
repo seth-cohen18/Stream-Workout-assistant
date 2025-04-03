@@ -1,1865 +1,843 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Stream AI Workout Assistant</title>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-  <style>
-    :root {
-      --primary-color: #3498db;
-      --secondary-color: #2ecc71;
-      --accent-color: #e74c3c;
-      --text-color: #333;
-      --bg-color: #f8f9fa;
-      --card-bg: #ffffff;
-      --border-color: #e0e0e0;
-      --header-bg: #2c3e50;
-      --header-text: #ecf0f1;
-      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      --border-radius: 8px;
-    }
-
-    .dark-mode {
-      --primary-color: #4fa3d1;
-      --secondary-color: #2ecc71;
-      --accent-color: #e74c3c;
-      --text-color: #f0f0f0;
-      --bg-color: #121212;
-      --card-bg: #1e1e1e;
-      --border-color: #333;
-      --header-bg: #1a1a2e;
-      --header-text: #f0f0f0;
-      --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      line-height: 1.6;
-    }
-
-    header {
-      background-color: var(--header-bg);
-      color: var(--header-text);
-      padding: 20px;
-      box-shadow: var(--shadow);
-      position: relative;
-    }
-
-    .header-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    
-    .logo-title-container {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-    
-    .app-logo {
-      width: 48px;
-      height: 48px;
-    }
-
-    .app-title {
-      font-size: 1.8rem;
-      font-weight: 700;
-    }
-
-    .theme-toggle {
-      background: none;
-      border: none;
-      color: var(--header-text);
-      font-size: 1.2rem;
-      cursor: pointer;
-      padding: 5px;
-      border-radius: 50%;
-    }
-
-    .profile-summary {
-      display: flex;
-      align-items: center;
-      font-size: 0.9rem;
-    }
-
-    .profile-pic {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      margin-right: 10px;
-      background-color: var(--secondary-color);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: bold;
-    }
-
-    nav {
-      background-color: var(--card-bg);
-      box-shadow: var(--shadow);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .nav-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .nav-tabs {
-      display: flex;
-      list-style: none;
-    }
-
-    .nav-tabs li {
-      position: relative;
-    }
-
-    .nav-tabs a {
-      color: var(--text-color);
-      text-decoration: none;
-      padding: 15px 20px;
-      display: block;
-      font-weight: 500;
-      position: relative;
-    }
-
-    .nav-tabs a::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 0;
-      height: 3px;
-      background-color: var(--primary-color);
-      transition: width 0.3s;
-    }
-
-    .nav-tabs a.active::after,
-    .nav-tabs a:hover::after {
-      width: 100%;
-    }
-
-    .nav-tabs a.active {
-      color: var(--primary-color);
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    .tab {
-      display: none;
-      animation: fadeIn 0.5s;
-    }
-
-    .tab.active {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    .card {
-      background-color: var(--card-bg);
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow);
-      margin-bottom: 20px;
-      overflow: hidden;
-    }
-
-    .card-header {
-      padding: 15px 20px;
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .card-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: var(--primary-color);
-    }
-
-    .card-body {
-      padding: 20px;
-    }
-
-    .button {
-      background-color: var(--primary-color);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 500;
-      transition: background-color 0.3s;
-    }
-
-    .button:hover {
-      background-color: #2980b9;
-    }
-
-    .button.secondary {
-      background-color: var(--secondary-color);
-    }
-
-    .button.secondary:hover {
-      background-color: #27ae60;
-    }
-
-    .button.danger {
-      background-color: var(--accent-color);
-    }
-
-    .button.danger:hover {
-      background-color: #c0392b;
-    }
-
-    .button.disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .form-group {
-      margin-bottom: 15px;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: 500;
-    }
-
-    .form-control {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      background-color: var(--card-bg);
-      color: var(--text-color);
-    }
-
-    .form-control:focus {
-      outline: none;
-      border-color: var(--primary-color);
-    }
-
-    .exercise-options {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    .exercise-option {
-      padding: 10px 15px;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .exercise-option:hover {
-      border-color: var(--primary-color);
-    }
-
-    .exercise-option.active {
-      background-color: var(--primary-color);
-      color: white;
-      border-color: var(--primary-color);
-    }
-
-    .workout-area {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .video-container {
-      position: relative;
-      width: 100%;
-      height: 0;
-      padding-bottom: 56.25%; /* 16:9 aspect ratio */
-      overflow: hidden;
-      background-color: #000;
-      border-radius: var(--border-radius);
-    }
-
-    #videoElement {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: #000;
-    }
-
-    #outputCanvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
-
-    .workout-controls {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .workout-stats {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .stat-card {
-      flex: 1;
-      min-width: 150px;
-      padding: 15px;
-      background-color: var(--card-bg);
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow);
-      text-align: center;
-    }
-
-    .stat-value {
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--primary-color);
-    }
-
-    .stat-label {
-      font-size: 0.9rem;
-      color: var(--text-color);
-      opacity: 0.8;
-    }
-
-    .instruction-card {
-      background-color: var(--card-bg);
-      border-radius: var(--border-radius);
-      padding: 15px;
-      margin-bottom: 20px;
-      border-left: 4px solid var(--primary-color);
-    }
-
-    .nutrition-search {
-      margin-bottom: 20px;
-    }
-
-    .ingredient-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .ingredient-tag {
-      padding: 5px 10px;
-      background-color: var(--primary-color);
-      color: white;
-      border-radius: 20px;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-    }
-
-    .ingredient-tag .remove {
-      margin-left: 5px;
-      cursor: pointer;
-    }
-
-    .recipe-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
-    }
-
-    .recipe-card {
-      border-radius: var(--border-radius);
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      transition: transform 0.3s;
-    }
-
-    .recipe-card:hover {
-      transform: translateY(-5px);
-    }
-
-    .recipe-image {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-    }
-
-    .recipe-content {
-      padding: 15px;
-      background-color: var(--card-bg);
-    }
-
-    .recipe-title {
-      font-size: 1.1rem;
-      margin-bottom: 10px;
-      color: var(--text-color);
-    }
-
-    .recipe-meta {
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      font-size: 0.9rem;
-      color: var(--text-color);
-      opacity: 0.8;
-    }
-
-    .recipe-meta span {
-      margin-right: 10px;
-      margin-bottom: 5px;
-    }
-
-    .progress-container {
-      margin-bottom: 30px;
-    }
-
-    .progress-bar {
-      height: 20px;
-      background-color: var(--border-color);
-      border-radius: 10px;
-      overflow: hidden;
-      margin-top: 10px;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background-color: var(--primary-color);
-      border-radius: 10px;
-      transition: width 0.3s ease;
-    }
-
-    .chart-container {
-      height: 300px;
-      margin-top: 20px;
-    }
-
-    .feedback-message {
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: var(--border-radius);
-      background-color: rgba(46, 204, 113, 0.1);
-      border-left: 4px solid var(--secondary-color);
-    }
-
-    .feedback-message.warning {
-      background-color: rgba(231, 76, 60, 0.1);
-      border-left-color: var(--accent-color);
-    }
-
-    .session-summary {
-      background-color: var(--card-bg);
-      border-radius: var(--border-radius);
-      padding: 20px;
-      margin-top: 20px;
-      box-shadow: var(--shadow);
-      display: none;
-    }
-
-    .summary-stats {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
-
-    .summary-stat {
-      text-align: center;
-      flex: 1;
-    }
-
-    .summary-value {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: var(--primary-color);
-    }
-
-    .summary-label {
-      font-size: 0.9rem;
-      color: var(--text-color);
-      opacity: 0.8;
-    }
-
-    .feedback-list {
-      margin-top: 20px;
-    }
-
-    .feedback-item {
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: var(--border-radius);
-      background-color: var(--bg-color);
-      border-left: 3px solid var(--primary-color);
-    }
-
-    #repCounter {
-      font-size: 5rem;
-      font-weight: 700;
-      color: var(--primary-color);
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      background-color: rgba(0, 0, 0, 0.5);
-      padding: 5px 15px;
-      border-radius: var(--border-radius);
-      z-index: 10;
-    }
-    
-    .no-results {
-      padding: 20px;
-      text-align: center;
-      background-color: rgba(0, 0, 0, 0.05);
-      border-radius: var(--border-radius);
-    }
-    
-    .error-message {
-      padding: 15px;
-      background-color: rgba(231, 76, 60, 0.1);
-      border-left: 4px solid var(--accent-color);
-      border-radius: var(--border-radius);
-    }
-
-    @media (max-width: 768px) {
-      .app-title {
-        font-size: 1.5rem;
-      }
-
-      .nav-tabs a {
-        padding: 10px 15px;
-        font-size: 0.9rem;
-      }
-
-      .workout-stats {
-        flex-direction: column;
-      }
-
-      .stat-card {
-        width: 100%;
-      }
-
-      .recipe-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* For file upload */
-    .file-upload {
-      position: relative;
-      display: inline-block;
-      margin: 10px 0;
-    }
-
-    .file-upload-input {
-      display: none;
-    }
-
-    .file-upload-button {
-      padding: 10px 20px;
-      background-color: var(--primary-color);
-      color: white;
-      border-radius: 4px;
-      cursor: pointer;
-      display: inline-block;
-    }
-
-    .file-name {
-      margin-left: 10px;
-    }
-
-    /* Loading indicator */
-    .loader {
-      border: 4px solid rgba(0, 0, 0, 0.1);
-      border-radius: 50%;
-      border-top: 4px solid var(--primary-color);
-      width: 30px;
-      height: 30px;
-      animation: spin 1s linear infinite;
-      display: inline-block;
-      vertical-align: middle;
-      margin-right: 10px;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    /* New styles for enhanced UI */
-    .science-callout {
-      background-color: rgba(52, 152, 219, 0.1);
-      border-left: 4px solid var(--primary-color);
-      padding: 10px 15px;
-      margin: 10px 0;
-      border-radius: 4px;
-    }
-
-    .science-callout h4 {
-      margin-bottom: 5px;
-      color: var(--primary-color);
-    }
-
-    .form-cue-list {
-      margin: 10px 0 10px 20px;
-    }
-
-    .form-cue-list li {
-      margin-bottom: 5px;
-      position: relative;
-      padding-left: 5px;
-    }
-
-    .form-cue-list li::before {
-      content: "•";
-      position: absolute;
-      left: -15px;
-      color: var(--primary-color);
-    }
-
-    .exercise-header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .exercise-icon {
-      width: 40px;
-      height: 40px;
-      background-color: var(--primary-color);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      margin-right: 15px;
-    }
-
-    .difficulty-badge {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 12px;
-      font-size: 0.8rem;
-      margin-left: 10px;
-      background-color: #3498db;
-      color: white;
-    }
-
-    .difficulty-badge.beginner {
-      background-color: var(--secondary-color);
-    }
-
-    .difficulty-badge.intermediate {
-      background-color: #f39c12;
-    }
-
-    .difficulty-badge.advanced {
-      background-color: var(--accent-color);
-    }
-
-    .muscles-worked {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      margin: 10px 0;
-    }
-
-    .muscle-tag {
-      background-color: rgba(52, 152, 219, 0.1);
-      padding: 3px 8px;
-      border-radius: 12px;
-      font-size: 0.8rem;
-      color: var(--primary-color);
-      border: 1px solid var(--primary-color);
-    }
-
-    /* Enhanced modal styles */
-    .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s, visibility 0.3s;
-    }
-
-    .modal.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .modal-content {
-      background-color: var(--card-bg);
-      border-radius: var(--border-radius);
-      width: 80%;
-      max-width: 800px;
-      max-height: 80vh;
-      overflow-y: auto;
-      position: relative;
-    }
-
-    .modal-header {
-      padding: 15px 20px;
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .modal-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: var(--primary-color);
-    }
-
-    .modal-close {
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: var(--text-color);
-    }
-
-    .modal-body {
-      padding: 20px;
-    }
-
-    /* Animations */
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
-
-    .pulse {
-      animation: pulse 1s infinite;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stream-AI Workout Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/dark-mode.css">
+    <link rel="icon" href="/static/img/logo.png" type="image/png">
 </head>
 <body>
-  <header>
-    <div class="header-content">
-      <div class="logo-title-container">
-        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIwIiBmaWxsPSIjMDAzYzc0Ii8+PGNpcmNsZSBjeD0iNTAiIGN5PSIzMCIgcj0iMTUiIGZpbGw9IiNlY2YwZjEiLz48cmVjdCB4PSI0MCIgeT0iNDUiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyNSIgZmlsbD0iI2VjZjBmMSIvPjxsaW5lIHgxPSIyNSIgeTE9IjUwIiB4Mj0iNzUiIHkyPSI1MCIgc3Ryb2tlPSIjZWNmMGYxIiBzdHJva2Utd2lkdGg9IjUiLz48bGluZSB4MT0iMjUiIHkxPSI0MCIgeDI9IjMwIiB5Mj0iNDAiIHN0cm9rZT0iI2VjZjBmMSIgc3Ryb2tlLXdpZHRoPSI1Ii8+PGxpbmUgeDE9IjI1IiB5MT0iNTAiIHgyPSIzMCIgeTI9IjUwIiBzdHJva2U9IiNlY2YwZjEiIHN0cm9rZS13aWR0aD0iNSIvPjxsaW5lIHgxPSIyNSIgeTE9IjYwIiB4Mj0iMzAiIHkyPSI2MCIgc3Ryb2tlPSIjZWNmMGYxIiBzdHJva2Utd2lkdGg9IjUiLz48bGluZSB4MT0iNzAiIHkxPSI0MCIgeDI9Ijc1IiB5Mj0iNDAiIHN0cm9rZT0iI2VjZjBmMSIgc3Ryb2tlLXdpZHRoPSI1Ii8+PGxpbmUgeDE9IjcwIiB5MT0iNTAiIHgyPSI3NSIgeTI9IjUwIiBzdHJva2U9IiNlY2YwZjEiIHN0cm9rZS13aWR0aD0iNSIvPjxsaW5lIHgxPSI3MCIgeTE9IjYwIiB4Mj0iNzUiIHkyPSI2MCIgc3Ryb2tlPSIjZWNmMGYxIiBzdHJva2Utd2lkdGg9IjUiLz48bGluZSB4MT0iNDAiIHkxPSI3MCIgeDI9IjQwIiB5Mj0iODUiIHN0cm9rZT0iI2VjZjBmMSIgc3Ryb2tlLXdpZHRoPSI1Ii8+PGxpbmUgeDE9IjYwIiB5MT0iNzAiIHgyPSI2MCIgeTI9Ijg1IiBzdHJva2U9IiNlY2YwZjEiIHN0cm9rZS13aWR0aD0iNSIvPjwvc3ZnPg==" alt="Stream AI Workout Assistant Logo" class="app-logo">
-        <h1 class="app-title">Stream AI Workout Assistant</h1>
-      </div>
-      <div class="profile-summary">
-        <div class="profile-pic">
-          <i class="fas fa-user"></i>
-        </div>
-        <div class="profile-info">
-          <div class="profile-name">User</div>
-          <div class="profile-level">Level 1</div>
-        </div>
-      </div>
-      <button id="themeToggle" class="theme-toggle">
-        <i class="fas fa-moon"></i>
-      </button>
-    </div>
-  </header>
-
-  <nav>
-    <div class="nav-container">
-      <ul class="nav-tabs">
-        <li><a href="#workouts" class="tab-link active" data-tab="workouts"><i class="fas fa-dumbbell"></i> Workouts</a></li>
-        <li><a href="#nutrition" class="tab-link" data-tab="nutrition"><i class="fas fa-apple-alt"></i> Nutrition</a></li>
-        <li><a href="#progress" class="tab-link" data-tab="progress"><i class="fas fa-chart-line"></i> Progress</a></li>
-      </ul>
-    </div>
-  </nav>
-
-  <div class="container">
-    <!-- Workouts Tab -->
-    <div id="workouts" class="tab active">
-      <div class="card">
-        <div class="card-header">
-          <h2 class="card-title">Choose Your Exercise</h2>
-        </div>
-        <div class="card-body">
-          <div class="exercise-options">
-            <div class="exercise-option" data-exercise="Squats">Squats</div>
-            <div class="exercise-option" data-exercise="Bicep Curls">Bicep Curls</div>
-            <div class="exercise-option" data-exercise="Push-Ups">Push-Ups</div>
-            <div class="exercise-option" data-exercise="Shoulder Press">Shoulder Press</div>
-            <div class="exercise-option" data-exercise="Lunges">Lunges</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="instruction-card" id="exerciseInstructions">
-        <h3>Exercise Instructions</h3>
-        <p class="exercise-description">Select an exercise to see instructions.</p>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <h2 class="card-title">Live Workout</h2>
-          <div class="workout-controls">
-            <button id="startExerciseBtn" class="button disabled"><i class="fas fa-play"></i> Start Exercise</button>
-            <button id="endExerciseBtn" class="button danger disabled"><i class="fas fa-stop"></i> End Exercise</button>
-          </div>
-        </div>
-        <div class="card-body">
-          <div class="workout-area">
-            <div class="video-container">
-              <div id="repCounter" class="hidden">0</div>
-              <video id="videoElement" autoplay hidden></video>
-              <canvas id="outputCanvas"></canvas>
-            </div>
-            
-            <div class="file-upload">
-              <label for="videoUpload" class="file-upload-button">
-                <i class="fas fa-upload"></i> Upload Workout Video
-              </label>
-              <input type="file" id="videoUpload" class="file-upload-input" accept="video/*">
-              <span class="file-name"></span>
-            </div>
-
-            <div id="feedbackArea" class="feedback-message hidden"></div>
-            
-            <div class="workout-stats">
-              <div class="stat-card">
-                <div class="stat-value" id="currentReps">0</div>
-                <div class="stat-label">Reps Completed</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-value" id="avgTime">0.0s</div>
-                <div class="stat-label">Avg Rep Time</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-value" id="caloriesBurned">0</div>
-                <div class="stat-label">Calories</div>
-              </div>
-            </div>
-          </div>
-
-          <div id="sessionSummary" class="session-summary">
-            <h3>Workout Summary</h3>
-            <div class="summary-stats">
-              <div class="summary-stat">
-                <div class="summary-value" id="summaryReps">0</div>
-                <div class="summary-label">Total Reps</div>
-              </div>
-              <div class="summary-stat">
-                <div class="summary-value" id="summaryTime">0:00</div>
-                <div class="summary-label">Workout Time</div>
-              </div>
-              <div class="summary-stat">
-                <div class="summary-value" id="summaryCalories">0</div>
-                <div class="summary-label">Calories Burned</div>
-              </div>
-            </div>
-            <h4>Form Feedback</h4>
-            <div id="feedbackList" class="feedback-list"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Nutrition Tab -->
-    <div id="nutrition" class="tab">
-      <div class="card">
-        <div class="card-header">
-          <h2 class="card-title">Find Healthy Recipes</h2>
-        </div>
-        <div class="card-body">
-          <div class="nutrition-search">
-            <div class="form-group">
-              <label for="ingredientInput">Enter ingredients you have:</label>
-              <div class="input-group">
-                <input type="text" id="ingredientInput" class="form-control" placeholder="e.g., chicken, broccoli, rice">
-                <button id="addIngredientBtn" class="button">Add</button>
-              </div>
-            </div>
-            <div class="ingredient-tags" id="ingredientTags"></div>
-            
-            <div class="form-group" style="margin-top: 15px;">
-              <label>Search for recipes that use:</label>
-              <div style="display: flex; gap: 20px; margin-top: 5px;">
-                <label style="display: flex; align-items: center; cursor: pointer;">
-                  <input type="radio" name="searchType" id="searchWithAll" checked>
-                  <span style="margin-left: 8px;">All my ingredients</span>
-                </label>
-                <label style="display: flex; align-items: center; cursor: pointer;">
-                  <input type="radio" name="searchType" id="searchWithAny">
-                  <span style="margin-left: 8px;">Any of my ingredients</span>
-                </label>
-              </div>
-            </div>
-            
-            <button id="searchRecipesBtn" class="button" style="margin-top: 15px;"><i class="fas fa-search"></i> Find Recipes</button>
-          </div>
-          
-          <div id="recipesLoading" class="hidden">
-            <div class="loader"></div> Searching for recipes...
-          </div>
-          
-          <div id="recipeResults" class="recipe-grid"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Progress Tab -->
-    <div id="progress" class="tab">
-      <div class="card">
-        <div class="card-header">
-          <h2 class="card-title">Your Fitness Journey</h2>
-        </div>
-        <div class="card-body">
-          <div class="progress-container">
-            <h3>Level Progress</h3>
-            <div class="progress-bar">
-              <div class="progress-fill" id="levelProgress" style="width: 35%;"></div>
-            </div>
-            <div style="display: flex; justify-content: space-between; margin-top: 5px;">
-              <span>Level 1</span>
-              <span>Level 2</span>
-            </div>
-          </div>
-          
-          <h3>Exercise History</h3>
-          <div class="chart-container">
-            <canvas id="progressChart"></canvas>
-          </div>
-          
-          <div class="exercise-summary">
-            <h3>Exercise Summary</h3>
-            <div class="workout-stats">
-              <div class="stat-card">
-                <div class="stat-value" id="SquatsCount">0</div>
-                <div class="stat-label">Squats</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-value" id="BicepCurlsCount">0</div>
-                <div class="stat-label">Bicep Curls</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-value" id="PushUpsCount">0</div>
-                <div class="stat-label">Push-Ups</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-value" id="ShoulderPressCount">0</div>
-                <div class="stat-label">Shoulder Press</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-value" id="LungesCount">0</div>
-                <div class="stat-label">Lunges</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Recipe Details Modal -->
-  <div id="recipeModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title" id="recipeModalTitle">Recipe Details</h3>
-        <button class="modal-close">&times;</button>
-      </div>
-      <div class="modal-body" id="recipeModalBody">
-        <!-- Recipe details will be loaded here -->
-      </div>
-    </div>
-  </div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/chart.js/3.7.0/chart.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/tensorflow/4.2.0/tf.min.js"></script>
-  <script>
-    // Theme toggling
-    const themeToggle = document.getElementById('themeToggle');
-    const body = document.body;
-    
-    themeToggle.addEventListener('click', () => {
-      body.classList.toggle('dark-mode');
-      
-      if (body.classList.contains('dark-mode')) {
-        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-        localStorage.setItem('theme', 'dark');
-      } else {
-        themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-        localStorage.setItem('theme', 'light');
-      }
-    });
-    
-    // Check for saved theme preference
-    if (localStorage.getItem('theme') === 'dark') {
-      body.classList.add('dark-mode');
-      themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-    }
-    
-    // Tab switching
-    const tabs = document.querySelectorAll('.tab-link');
-    const tabContents = document.querySelectorAll('.tab');
-    
-    tabs.forEach(tab => {
-      tab.addEventListener('click', (e) => {
-        e.preventDefault();
-        tabs.forEach(t => t.classList.remove('active'));
-        tabContents.forEach(c => c.classList.remove('active'));
-        
-        tab.classList.add('active');
-        const tabId = tab.getAttribute('data-tab');
-        document.getElementById(tabId).classList.add('active');
-      });
-    });
-    
-    // Exercise selection
-    const exerciseOptions = document.querySelectorAll('.exercise-option');
-    const exerciseInstructions = document.getElementById('exerciseInstructions');
-    const startExerciseBtn = document.getElementById('startExerciseBtn');
-    let selectedExercise = null;
-    
-    exerciseOptions.forEach(option => {
-      option.addEventListener('click', () => {
-        exerciseOptions.forEach(o => o.classList.remove('active'));
-        option.classList.add('active');
-        selectedExercise = option.getAttribute('data-exercise');
-        updateExerciseInstructions(selectedExercise);
-        startExerciseBtn.classList.remove('disabled');
-      });
-    });
-    
-    function updateExerciseInstructions(exercise) {
-      const instructions = {
-        'Squats': {
-          description: 'A compound exercise that targets the quadriceps, hamstrings, and glutes.',
-          steps: [
-            'Stand with feet shoulder-width apart',
-            'Keep your back straight and chest up', 
-            'Lower your body by bending your knees, as if sitting back into a chair',
-            'Keep knees aligned with toes and don\'t let them go beyond your toes',
-            'Lower until thighs are parallel to the ground (or as far as comfortable)',
-            'Push through your heels to return to starting position'
-          ],
-          science: 'Squats activate multiple muscle groups simultaneously, increasing growth hormone production and improving overall lower body strength. Proper form reduces knee strain by distributing weight properly through the posterior chain.',
-          difficulty: 'beginner',
-          muscles: ['Quadriceps', 'Hamstrings', 'Glutes', 'Core']
-        },
-        'Bicep Curls': {
-          description: 'An isolation exercise that targets the biceps brachii.',
-          steps: [
-            'Stand with feet shoulder-width apart',
-            'Hold dumbbells with arms fully extended and palms facing forward',
-            'Keep your elbows close to your torso',
-            'Curl the weights up toward your shoulders while contracting your biceps',
-            'Slowly lower the weights back to the starting position',
-            'Maintain proper posture throughout the movement'
-          ],
-          science: 'Bicep curls isolate the biceps brachii, developing arm strength and muscle definition. Controlled eccentric (lowering) phase is crucial for maximizing muscle fiber recruitment.',
-          difficulty: 'beginner',
-          muscles: ['Biceps', 'Forearms']
-        },
-        'Push-Ups': {
-          description: 'A compound exercise that targets the chest, shoulders, and triceps.',
-          steps: [
-            'Begin in a plank position with hands slightly wider than shoulder-width apart',
-            'Keep your body in a straight line from head to heels',
-            'Lower your chest toward the floor by bending your elbows',
-            'Keep your elbows at a 45-degree angle to your body (not flared out)',
-            'Lower until your chest nearly touches the floor',
-            'Push back up to the starting position by extending your arms'
-          ],
-          science: 'Push-ups engage multiple upper body muscle groups simultaneously while requiring core stabilization. The close chain nature of this exercise recruits more stabilizing muscles than machine alternatives.',
-          difficulty: 'intermediate',
-          muscles: ['Chest', 'Shoulders', 'Triceps', 'Core']
-        },
-        'Shoulder Press': {
-          description: 'A compound movement that targets the deltoids and strengthens shoulder stability.',
-          steps: [
-            'Sit or stand with your back straight and core engaged',
-            'Hold dumbbells at shoulder height with palms facing forward',
-            'Push the weights upward until your arms are fully extended overhead',
-            'Pause briefly at the top of the movement',
-            'Slowly lower the weights back to the starting position at shoulder level',
-            'Maintain control throughout the entire movement'
-          ],
-          science: 'The shoulder press effectively targets all three deltoid heads, particularly emphasizing the anterior and lateral portions. It also engages stabilizer muscles in the rotator cuff, promoting shoulder joint integrity and reducing injury risk when performed with proper form.',
-          difficulty: 'intermediate',
-          muscles: ['Deltoids', 'Triceps', 'Trapezius', 'Core']
-        },
-        'Lunges': {
-          description: 'A unilateral exercise that targets the quadriceps, hamstrings, and glutes.',
-          steps: [
-            'Stand with feet hip-width apart',
-            'Step forward with one leg, keeping your upper body straight',
-            'Lower your hips until both knees are bent at about a 90-degree angle',
-            'Front knee should be directly above the ankle, not pushed forward',
-            'Back knee should hover just above the ground',
-            'Push through the front heel to return to starting position',
-            'Repeat with the other leg'
-          ],
-          science: 'Lunges address muscular imbalances by working legs independently. The unilateral nature improves balance, coordination, and functional strength. The exercise activates stabilizing hip muscles often underdeveloped with bilateral exercises.',
-          difficulty: 'intermediate',
-          muscles: ['Quadriceps', 'Hamstrings', 'Glutes', 'Core']
-        }
-      };
-      
-      const exerciseInfo = instructions[exercise];
-      
-      let stepsHTML = '<ul class="form-cue-list">';
-      exerciseInfo.steps.forEach(step => {
-        stepsHTML += `<li>${step}</li>`;
-      });
-      stepsHTML += '</ul>';
-      
-      let musclesHTML = '<div class="muscles-worked">';
-      exerciseInfo.muscles.forEach(muscle => {
-        musclesHTML += `<span class="muscle-tag">${muscle}</span>`;
-      });
-      musclesHTML += '</div>';
-      
-      const html = `
-        <div class="exercise-header">
-          <div class="exercise-icon"><i class="fas fa-dumbbell"></i></div>
-          <h3>${exercise} <span class="difficulty-badge ${exerciseInfo.difficulty}">${exerciseInfo.difficulty.charAt(0).toUpperCase() + exerciseInfo.difficulty.slice(1)}</span></h3>
-        </div>
-        <p class="exercise-description">${exerciseInfo.description}</p>
-        <h4>Muscles Worked:</h4>
-        ${musclesHTML}
-        <h4>Proper Form:</h4>
-        ${stepsHTML}
-        <div class="science-callout">
-          <h4><i class="fas fa-flask"></i> Exercise Science:</h4>
-          <p>${exerciseInfo.science}</p>
-        </div>
-      `;
-      
-      exerciseInstructions.innerHTML = html;
-    }
-    
-    // Workout functionality
-    const videoElement = document.getElementById('videoElement');
-    const outputCanvas = document.getElementById('outputCanvas');
-    const startBtn = document.getElementById('startExerciseBtn');
-    const endBtn = document.getElementById('endExerciseBtn');
-    const repCounter = document.getElementById('repCounter');
-    const currentRepsElement = document.getElementById('currentReps');
-    const avgTimeElement = document.getElementById('avgTime');
-    const caloriesBurnedElement = document.getElementById('caloriesBurned');
-    const feedbackArea = document.getElementById('feedbackArea');
-    const sessionSummary = document.getElementById('sessionSummary');
-    const summaryReps = document.getElementById('summaryReps');
-    const summaryTime = document.getElementById('summaryTime');
-    const summaryCalories = document.getElementById('summaryCalories');
-    const feedbackList = document.getElementById('feedbackList');
-    
-    let stream = null;
-    let isExercising = false;
-    let reps = 0;
-    let startTime = null;
-    let repTimes = [];
-    let feedbacks = [];
-    let poseDetectionModel = null;
-    let ctx = outputCanvas.getContext('2d');
-    
-    // Function to initialize camera
-    async function initCamera() {
-      try {
-        // Using lower resolution to reduce lag
-        const constraints = {
-          video: {
-            width: { ideal: 640 },
-            height: { ideal: 480 },
-            facingMode: 'user',
-            frameRate: { ideal: 30 }
-          }
-        };
-        
-        stream = await navigator.mediaDevices.getUserMedia(constraints);
-        videoElement.srcObject = stream;
-        
-        // Set canvas dimensions to match video
-        videoElement.onloadedmetadata = () => {
-          outputCanvas.width = videoElement.videoWidth;
-          outputCanvas.height = videoElement.videoHeight;
-          videoElement.hidden = false;
-        };
-        
-        return true;
-      } catch (err) {
-        console.error('Error accessing camera:', err);
-        feedbackArea.textContent = 'Camera access error: ' + err.message;
-        feedbackArea.classList.remove('hidden');
-        return false;
-      }
-    }
-    
-    // Load TensorFlow.js pose detection model
-    async function loadPoseDetectionModel() {
-      try {
-        // Show loading indicator
-        feedbackArea.textContent = 'Loading exercise analysis model...';
-        feedbackArea.classList.remove('hidden');
-        
-        // In a real implementation, you would load a pre-trained model
-        // For this demo, we'll simulate model loading
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        feedbackArea.textContent = 'Model loaded successfully!';
-        setTimeout(() => {
-          feedbackArea.classList.add('hidden');
-        }, 2000);
-        
-        return true;
-      } catch (err) {
-        console.error('Error loading model:', err);
-        feedbackArea.textContent = 'Error loading model: ' + err.message;
-        return false;
-      }
-    }
-    
-    // Simulated pose detection and rep counting
-    function detectPoseAndCountReps() {
-      if (!isExercising) return;
-      
-      ctx.clearRect(0, 0, outputCanvas.width, outputCanvas.height);
-      ctx.drawImage(videoElement, 0, 0, outputCanvas.width, outputCanvas.height);
-      
-      // In a real implementation, run pose detection here
-      // For this demo, we'll simulate rep counting and feedback
-      
-      // Randomly increment rep count (approximately every 3 seconds)
-      if (Math.random() < 0.01) {
-        reps++;
-        repCounter.textContent = reps;
-        currentRepsElement.textContent = reps;
-        
-        // Calculate time for this rep
-        const now = new Date();
-        if (repTimes.length > 0) {
-          const lastRepTime = now - repTimes[repTimes.length - 1];
-          repTimes.push(now);
-          
-          // Update average rep time
-          const totalTime = repTimes.reduce((sum, time, i) => {
-            if (i === 0) return 0;
-            return sum + (time - repTimes[i-1]);
-          }, 0);
-          
-          const avgTime = totalTime / (repTimes.length - 1) / 1000;
-          avgTimeElement.textContent = avgTime.toFixed(1) + 's';
-          
-          // Generate random feedback on occasion
-          if (Math.random() < 0.3) {
-            const feedbackOptions = [
-              'Great form! Keep it up!',
-              'Try to go a bit deeper on your next rep.',
-              'Remember to keep your back straight.',
-              'Excellent range of motion!',
-              'Slow down slightly for better muscle engagement.'
-            ];
-            
-            const feedback = feedbackOptions[Math.floor(Math.random() * feedbackOptions.length)];
-            feedbackArea.textContent = feedback;
-            feedbackArea.classList.remove('hidden');
-            feedbacks.push(feedback);
-            
-            setTimeout(() => {
-              feedbackArea.classList.add('hidden');
-            }, 3000);
-          }
-        } else {
-          repTimes.push(now);
-        }
-        
-        // Update calories (simple estimate)
-        const caloriesPerRep = {
-          'Squats': 0.32,
-          'Bicep Curls': 0.15,
-          'Push-Ups': 0.29,
-          'Shoulder Press': 0.20,
-          'Lunges': 0.3
-        };
-        
-        const calories = Math.round(reps * (caloriesPerRep[selectedExercise] || 0.2));
-        caloriesBurnedElement.textContent = calories;
-      }
-      
-      // Draw skeletal overlay (simplified for demo)
-      if (reps > 0) {
-        drawSimplifiedSkeleton();
-      }
-      
-      requestAnimationFrame(detectPoseAndCountReps);
-    }
-    
-    // Draw a simplified skeleton overlay on the canvas
-    function drawSimplifiedSkeleton() {
-      // Simple stick figure-like skeleton
-      ctx.strokeStyle = '#3498db';
-      ctx.lineWidth = 4;
-      
-      // This is a very simplified skeleton just for visual effect
-      // In a real implementation, you would use actual pose keypoints
-      
-      // Randomize slightly to simulate movement
-      const centerX = outputCanvas.width / 2 + (Math.random() * 10 - 5);
-      const topY = outputCanvas.height / 4 + (Math.random() * 10 - 5);
-      
-      // Head
-      ctx.beginPath();
-      ctx.arc(centerX, topY, 20, 0, Math.PI * 2);
-      ctx.stroke();
-      
-      // Body
-      ctx.beginPath();
-      ctx.moveTo(centerX, topY + 20);
-      ctx.lineTo(centerX, topY + 100);
-      ctx.stroke();
-      
-      // Arms
-      ctx.beginPath();
-      ctx.moveTo(centerX, topY + 40);
-      ctx.lineTo(centerX - 40, topY + 70 + (Math.random() * 10 - 5));
-      ctx.moveTo(centerX, topY + 40);
-      ctx.lineTo(centerX + 40, topY + 70 + (Math.random() * 10 - 5));
-      ctx.stroke();
-      
-      // Legs
-      ctx.beginPath();
-      ctx.moveTo(centerX, topY + 100);
-      ctx.lineTo(centerX - 30, topY + 180 + (Math.random() * 10 - 5));
-      ctx.moveTo(centerX, topY + 100);
-      ctx.lineTo(centerX + 30, topY + 180 + (Math.random() * 10 - 5));
-      ctx.stroke();
-    }
-    
-    // Start exercise
-    startBtn.addEventListener('click', async function() {
-      if (selectedExercise && !isExercising) {
-        // Initialize camera
-        const cameraInitialized = await initCamera();
-        if (!cameraInitialized) return;
-        
-        // Load pose detection model
-        const modelLoaded = await loadPoseDetectionModel();
-        if (!modelLoaded) return;
-        
-        // Start exercise tracking
-        isExercising = true;
-        startTime = new Date();
-        repCounter.textContent = '0';
-        repCounter.classList.remove('hidden');
-        startBtn.classList.add('disabled');
-        endBtn.classList.remove('disabled');
-        reps = 0;
-        repTimes = [];
-        feedbacks = [];
-        
-        // Start detection loop
-        detectPoseAndCountReps();
-      }
-    });
-    
-    // End exercise
-    endBtn.addEventListener('click', function() {
-      if (isExercising) {
-        isExercising = false;
-        
-        // Stop camera
-        if (stream) {
-          stream.getTracks().forEach(track => track.stop());
-        }
-        
-        videoElement.srcObject = null;
-        videoElement.hidden = true;
-        repCounter.classList.add('hidden');
-        startBtn.classList.remove('disabled');
-        endBtn.classList.add('disabled');
-        
-        // Update exercise stats in progress tab
-        const exerciseCountElement = document.getElementById(`${selectedExercise.replace('-', '')}Count`);
-        if (exerciseCountElement) {
-          exerciseCountElement.textContent = parseInt(exerciseCountElement.textContent) + reps;
-        }
-        
-        // Update level progress (simple simulation)
-        const levelProgressBar = document.getElementById('levelProgress');
-        const currentWidth = parseInt(levelProgressBar.style.width);
-        const newWidth = Math.min(currentWidth + reps / 2, 100);
-        levelProgressBar.style.width = `${newWidth}%`;
-        
-        // Update workout chart
-        updateWorkoutChart(selectedExercise, reps);
-        
-        // Show session summary
-        showSessionSummary();
-      }
-    });
-    
-    // Show session summary
-    function showSessionSummary() {
-      const endTime = new Date();
-      const workoutDuration = Math.floor((endTime - startTime) / 1000); // in seconds
-      
-      // Format duration
-      const minutes = Math.floor(workoutDuration / 60);
-      const seconds = workoutDuration % 60;
-      const formattedTime = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
-      
-      // Update summary
-      summaryReps.textContent = reps;
-      summaryTime.textContent = formattedTime;
-      
-      const caloriesPerRep = {
-        'Squats': 0.32,
-        'Bicep Curls': 0.15,
-        'Push-Ups': 0.29,
-        'Shoulder Press': 0.20,
-        'Lunges': 0.3
-      };
-      
-      const calories = Math.round(reps * (caloriesPerRep[selectedExercise] || 0.2));
-      summaryCalories.textContent = calories;
-      
-      // Display feedback items
-      feedbackList.innerHTML = '';
-      if (feedbacks.length > 0) {
-        feedbacks.forEach(feedback => {
-          const feedbackItem = document.createElement('div');
-          feedbackItem.className = 'feedback-item';
-          feedbackItem.textContent = feedback;
-          feedbackList.appendChild(feedbackItem);
-        });
-      } else {
-        const noFeedbackItem = document.createElement('div');
-        noFeedbackItem.className = 'feedback-item';
-        noFeedbackItem.textContent = 'No specific feedback - your form looked good!';
-        feedbackList.appendChild(noFeedbackItem);
-      }
-      
-      // Show summary
-      sessionSummary.style.display = 'block';
-    }
-    
-    // Update workout progress chart
-    function updateWorkoutChart(exercise, count) {
-      const ctx = document.getElementById('progressChart').getContext('2d');
-      
-      // If chart already exists, update data
-      if (window.workoutChart) {
-        const datasetIndex = window.workoutChart.data.labels.indexOf(exercise);
-        if (datasetIndex >= 0) {
-          window.workoutChart.data.datasets[0].data[datasetIndex] += count;
-        } else {
-          window.workoutChart.data.labels.push(exercise);
-          window.workoutChart.data.datasets[0].data.push(count);
-        }
-        window.workoutChart.update();
-        return;
-      }
-      
-      // Create new chart
-      const data = {
-        labels: [exercise],
-        datasets: [{
-          label: 'Reps Completed',
-          data: [count],
-          backgroundColor: [
-            'rgba(52, 152, 219, 0.6)',
-            'rgba(46, 204, 113, 0.6)',
-            'rgba(231, 76, 60, 0.6)',
-            'rgba(155, 89, 182, 0.6)',
-            'rgba(241, 196, 15, 0.6)'
-          ],
-          borderColor: [
-            'rgba(52, 152, 219, 1)',
-            'rgba(46, 204, 113, 1)',
-            'rgba(231, 76, 60, 1)',
-            'rgba(155, 89, 182, 1)',
-            'rgba(241, 196, 15, 1)'
-          ],
-          borderWidth: 1
-        }]
-      };
-      
-      window.workoutChart = new Chart(ctx, {
-        type: 'bar',
-        data: data,
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-      });
-    }
-    
-    // Video upload functionality
-    const videoUpload = document.getElementById('videoUpload');
-    const fileName = document.querySelector('.file-name');
-    
-    videoUpload.addEventListener('change', function(e) {
-      if (this.files && this.files[0]) {
-        fileName.textContent = this.files[0].name;
-        
-        // Process uploaded video
-        const fileURL = URL.createObjectURL(this.files[0]);
-        videoElement.src = fileURL;
-        videoElement.hidden = false;
-        videoElement.loop = true;
-        videoElement.onloadedmetadata = () => {
-          outputCanvas.width = videoElement.videoWidth;
-          outputCanvas.height = videoElement.videoHeight;
-          videoElement.play();
-        };
-        
-        // Enable start button
-        if (selectedExercise) {
-          startBtn.classList.remove('disabled');
-        }
-      }
-    });
-    
-    // Nutrition tab functionality with real Spoonacular API integration
-    const ingredientInput = document.getElementById('ingredientInput');
-    const addIngredientBtn = document.getElementById('addIngredientBtn');
-    const ingredientTags = document.getElementById('ingredientTags');
-    const searchRecipesBtn = document.getElementById('searchRecipesBtn');
-    const recipeResults = document.getElementById('recipeResults');
-    const recipesLoading = document.getElementById('recipesLoading');
-    const searchWithAllRadio = document.getElementById('searchWithAll');
-    const searchWithAnyRadio = document.getElementById('searchWithAny');
-
-    // Your Spoonacular API key - replace with your actual API key
-    const SPOONACULAR_API_KEY = 'YOUR_SPOONACULAR_API_KEY';
-
-    let ingredients = [];
-
-    // Add ingredient to the list
-    function addIngredient() {
-      const ingredient = ingredientInput.value.trim();
-      if (ingredient && !ingredients.includes(ingredient)) {
-        ingredients.push(ingredient);
-        updateIngredientTags();
-        ingredientInput.value = '';
-      }
-    }
-
-    // Update ingredient tags display
-    function updateIngredientTags() {
-      ingredientTags.innerHTML = '';
-      ingredients.forEach((ingredient, index) => {
-        const tag = document.createElement('div');
-        tag.className = 'ingredient-tag';
-        tag.innerHTML = `${ingredient} <span class="remove" data-index="${index}">&times;</span>`;
-        ingredientTags.appendChild(tag);
-      });
-      
-      // Add remove event listeners
-      document.querySelectorAll('.ingredient-tag .remove').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const index = parseInt(this.getAttribute('data-index'));
-          ingredients.splice(index, 1);
-          updateIngredientTags();
-        });
-      });
-    }
-
-    // Add ingredient when clicking Add button
-    addIngredientBtn.addEventListener('click', addIngredient);
-
-    // Add ingredient when pressing Enter
-    ingredientInput.addEventListener('keyup', function(e) {
-      if (e.key === 'Enter') {
-        addIngredient();
-      }
-    });
-
-    // Search for recipes using Spoonacular API
-    searchRecipesBtn.addEventListener('click', async function() {
-      if (ingredients.length === 0) {
-        alert('Please add at least one ingredient');
-        return;
-      }
-      
-      // Show loading indicator
-      recipesLoading.classList.remove('hidden');
-      recipeResults.innerHTML = '';
-      
-      // Determine search type based on radio button selection
-      const searchType = searchWithAllRadio.checked ? 'all' : 'any';
-      
-      try {
-        // Format ingredients for API
-        const ingredientsList = ingredients.join(',+');
-        let apiUrl;
-        
-        if (searchType === 'all') {
-          // Search recipes with ALL ingredients
-          apiUrl = `https://api.spoonacular.com/recipes/findByIngredients?ingredients=${ingredientsList}&number=12&ranking=1&apiKey=${SPOONACULAR_API_KEY}`;
-        } else {
-          // Search recipes with ANY of the ingredients
-          apiUrl = `https://api.spoonacular.com/recipes/complexSearch?includeIngredients=${ingredientsList}&number=12&addRecipeInformation=true&apiKey=${SPOONACULAR_API_KEY}`;
-        }
-        
-        const response = await fetch(apiUrl);
-        
-        if (!response.ok) {
-          throw new Error('API request failed');
-        }
-        
-        let recipes = await response.json();
-        
-        // Format response depending on endpoint used
-        if (searchType === 'any') {
-          recipes = recipes.results;
-        }
-        
-        if (recipes.length === 0) {
-          recipeResults.innerHTML = `<div class="no-results">No recipes found with your ingredients. Try adding more ingredients or changing your search option.</div>`;
-        } else {
-          // Display recipes
-          recipes.forEach(recipe => {
-            const recipeCard = document.createElement('div');
-            recipeCard.className = 'recipe-card';
-            recipeCard.setAttribute('data-id', recipe.id);
-            
-            // Get image URL (different based on endpoint)
-            const imageUrl = recipe.image;
-            
-            // Get ready in minutes (if available)
-            const readyInMinutes = recipe.readyInMinutes || 'N/A';
-            
-            recipeCard.innerHTML = `
-              <img src="${imageUrl}" alt="${recipe.title}" class="recipe-image">
-              <div class="recipe-content">
-                <h3 class="recipe-title">${recipe.title}</h3>
-                <div class="recipe-meta">
-                  <span><i class="far fa-clock"></i> ${readyInMinutes} min</span>
-                  ${searchType === 'all' ? `<span><i class="fas fa-list-check"></i> ${recipe.usedIngredientCount} of your ingredients</span>` : ''}
-                  <span><i class="fas fa-utensils"></i> View Details</span>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="/static/img/logo.png" alt="Stream-AI Workout Assistant" width="40" height="40" class="me-2">
+                Stream-AI Workout Assistant
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Find Healthy Recipes</h2>
                 </div>
-              </div>
-            `;
-            
-            recipeResults.appendChild(recipeCard);
-            
-            // Add click event to view recipe details
-            recipeCard.addEventListener('click', () => {
-              fetchAndShowRecipeDetails(recipe.id);
-            });
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching recipes:', error);
-        recipeResults.innerHTML = `<div class="error-message">Error fetching recipes. Please try again later.</div>`;
-      } finally {
-        // Hide loading indicator
-        recipesLoading.classList.add('hidden');
-      }
-    });
-
-    // Fetch detailed recipe information and show in modal
-    async function fetchAndShowRecipeDetails(recipeId) {
-      try {
-        // Show loading in modal
-        recipeModalTitle.textContent = 'Loading Recipe Details...';
-        recipeModalBody.innerHTML = '<div class="loader"></div>';
-        recipeModal.classList.add('active');
-        
-        // Fetch detailed recipe information
-        const apiUrl = `https://api.spoonacular.com/recipes/${recipeId}/information?includeNutrition=true&apiKey=${SPOONACULAR_API_KEY}`;
-        const response = await fetch(apiUrl);
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch recipe details');
-        }
-        
-        const recipe = await response.json();
-        
-        // Update modal with recipe details
-        recipeModalTitle.textContent = recipe.title;
-        
-        // Format ingredients list
-        let ingredientsList = '<ul class="form-cue-list">';
-        recipe.extendedIngredients.forEach(ingredient => {
-          ingredientsList += `<li>${ingredient.original}</li>`;
-        });
-        ingredientsList += '</ul>';
-        
-        // Format instructions
-        let instructions = '';
-        if (recipe.analyzedInstructions && recipe.analyzedInstructions.length > 0) {
-          instructions = '<ol style="margin-left: 20px;">';
-          recipe.analyzedInstructions[0].steps.forEach(step => {
-            instructions += `<li>${step.step}</li>`;
-          });
-          instructions += '</ol>';
-        } else if (recipe.instructions) {
-          instructions = `<p>${recipe.instructions}</p>`;
-        } else {
-          instructions = '<p>No instructions available for this recipe.</p>';
-        }
-        
-        // Get basic nutrition info
-        let nutritionInfo = '';
-        let calories = {amount: 0};
-        let protein = {amount: 0};
-        
-        if (recipe.nutrition && recipe.nutrition.nutrients) {
-          calories = recipe.nutrition.nutrients.find(n => n.name === "Calories") || {amount: 0};
-          protein = recipe.nutrition.nutrients.find(n => n.name === "Protein") || {amount: 0};
-          const carbs = recipe.nutrition.nutrients.find(n => n.name === "Carbohydrates") || {amount: 0};
-          const fat = recipe.nutrition.nutrients.find(n => n.name === "Fat") || {amount: 0};
-          
-          nutritionInfo = `
-            <div class="recipe-stats" style="display: flex; gap: 15px; margin-bottom: 15px;">
-              <div class="stat-card">
-                <div class="stat-value">${Math.round(calories.amount)}</div>
-                <div class="stat-label">Calories</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-value">${Math.round(protein.amount)}g</div>
-                <div class="stat-label">Protein</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-value">${Math.round(carbs.amount)}g</div>
-                <div class="stat-label">Carbs</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-value">${Math.round(fat.amount)}g</div>
-                <div class="stat-label">Fat</div>
-              </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="recipe-search-form">
+                                <ul class="nav nav-tabs mb-3" id="recipeSearchTabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="ingredients-tab" data-bs-toggle="tab" data-bs-target="#ingredients-panel" type="button" role="tab">
+                                            Search by Ingredients
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="meal-tab" data-bs-toggle="tab" data-bs-target="#meal-panel" type="button" role="tab">
+                                            Search by Meal
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="preferences-tab" data-bs-toggle="tab" data-bs-target="#preferences-panel" type="button" role="tab">
+                                            Dietary Preferences
+                                        </button>
+                                    </li>
+                                </ul>
+                                
+                                <div class="tab-content" id="recipeSearchTabContent">
+                                    <!-- Ingredients Panel -->
+                                    <div class="tab-pane fade show active" id="ingredients-panel" role="tabpanel">
+                                        <div class="mb-3">
+                                            <label for="ingredients-input" class="form-label">Enter ingredients you have:</label>
+                                            <div class="input-group">
+                                                <input type="text" id="ingredients-input" class="form-control" placeholder="e.g., chicken, broccoli, rice">
+                                                <button id="add-ingredient-btn" class="btn btn-primary">Add</button>
+                                            </div>
+                                            <small class="form-text text-muted">Enter one ingredient at a time or comma-separated list</small>
+                                        </div>
+                                        
+                                        <div id="ingredients-list" class="mb-3">
+                                            <!-- Ingredients tags will appear here -->
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label">Search for recipes that use:</label>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="searchType" id="search-all" value="all" checked>
+                                                <label class="form-check-label" for="search-all">
+                                                    All my ingredients
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="searchType" id="search-any" value="any">
+                                                <label class="form-check-label" for="search-any">
+                                                    Any of my ingredients
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        <button id="find-recipes-btn" class="btn btn-success" disabled>
+                                            <i class="fas fa-search"></i> Find Recipes
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Meal Panel -->
+                                    <div class="tab-pane fade" id="meal-panel" role="tabpanel">
+                                        <div class="mb-3">
+                                            <label for="meal-search-input" class="form-label">Search for a recipe:</label>
+                                            <div class="input-group">
+                                                <input type="text" id="meal-search-input" class="form-control" placeholder="e.g., lasagna, stir fry, smoothie">
+                                                <button id="search-meal-btn" class="btn btn-primary">
+                                                    <i class="fas fa-search"></i> Search
+                                                </button>
+                                            </div>
+                                            <small class="form-text text-muted">Enter a dish or meal you'd like to make</small>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label">Search by category:</label>
+                                            <select id="category-select" class="form-select">
+                                                <option value="" selected>All Categories</option>
+                                                <option value="Beef">Beef</option>
+                                                <option value="Chicken">Chicken</option>
+                                                <option value="Dessert">Dessert</option>
+                                                <option value="Lamb">Lamb</option>
+                                                <option value="Pasta">Pasta</option>
+                                                <option value="Pork">Pork</option>
+                                                <option value="Seafood">Seafood</option>
+                                                <option value="Side">Side Dish</option>
+                                                <option value="Vegetarian">Vegetarian</option>
+                                                <option value="Breakfast">Breakfast</option>
+                                                <option value="Vegan">Vegan</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <button id="search-category-btn" class="btn btn-success">
+                                            <i class="fas fa-filter"></i> Browse Category
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Dietary Preferences Panel -->
+                                    <div class="tab-pane fade" id="preferences-panel" role="tabpanel">
+                                        <div class="mb-3">
+                                            <label class="form-label">Dietary Restrictions:</label>
+                                            <div class="form-check">
+                                                <input class="form-check-input diet-restriction" type="checkbox" id="vegetarian-check">
+                                                <label class="form-check-label" for="vegetarian-check">Vegetarian</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input diet-restriction" type="checkbox" id="vegan-check">
+                                                <label class="form-check-label" for="vegan-check">Vegan</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input diet-restriction" type="checkbox" id="gluten-free-check">
+                                                <label class="form-check-label" for="gluten-free-check">Gluten Free</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input diet-restriction" type="checkbox" id="dairy-free-check">
+                                                <label class="form-check-label" for="dairy-free-check">Dairy Free</label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="allergies-input" class="form-label">Food Allergies:</label>
+                                            <div class="input-group">
+                                                <input type="text" id="allergies-input" class="form-control" placeholder="e.g., peanuts, shellfish, eggs">
+                                                <button id="add-allergy-btn" class="btn btn-primary">Add</button>
+                                            </div>
+                                            <small class="form-text text-muted">Enter items you're allergic to or want to avoid</small>
+                                        </div>
+                                        
+                                        <div id="allergies-list" class="mb-3">
+                                            <!-- Allergy tags will appear here -->
+                                        </div>
+                                        
+                                        <button id="save-preferences-btn" class="btn btn-success">
+                                            <i class="fas fa-save"></i> Save Preferences
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="nutrition-tips">
+                                <h4>Nutrition Tips</h4>
+                                <div class="card shadow-sm mb-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Post-Workout Nutrition</h5>
+                                        <p>Consume protein within 30 minutes after your workout to maximize muscle recovery. Aim for 20-30g of protein along with some carbohydrates.</p>
+                                    </div>
+                                </div>
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Hydration Reminder</h5>
+                                        <p>Drink at least 16-20 ounces of water for every hour of exercise. Proper hydration improves performance and recovery.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="recipe-results" class="mt-4 d-none">
+                        <h3>Recipe Results</h3>
+                        <div id="results-message" class="alert alert-info d-none"></div>
+                        <div id="recipe-cards" class="row"></div>
+                    </div>
+                    
+                    <div id="recipe-detail" class="mt-4 d-none">
+                        <button id="back-to-results" class="btn btn-secondary mb-3">
+                            <i class="fas fa-arrow-left"></i> Back to Results
+                        </button>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <img id="recipe-image" src="" alt="Recipe" class="img-fluid rounded shadow">
+                            </div>
+                            <div class="col-md-8">
+                                <h3 id="recipe-title"></h3>
+                                <div class="mb-2">
+                                    <span id="recipe-category" class="badge bg-primary me-2"></span>
+                                    <span id="recipe-area" class="badge bg-secondary me-2"></span>
+                                    <span id="recipe-tags" class=""></span>
+                                </div>
+                                
+                                <h5 class="mt-3">Ingredients</h5>
+                                <ul id="recipe-ingredients" class="list-group shadow-sm"></ul>
+                                
+                                <h5 class="mt-3">Instructions</h5>
+                                <div id="recipe-instructions" class="p-3 bg-light rounded shadow-sm"></div>
+                                
+                                <div class="mt-3">
+                                    <a id="recipe-source" href="#" target="_blank" class="btn btn-outline-primary me-2">
+                                        <i class="fas fa-external-link-alt"></i> View Original Recipe
+                                    </a>
+                                    <a id="recipe-youtube" href="#" target="_blank" class="btn btn-outline-danger">
+                                        <i class="fab fa-youtube"></i> Watch Video
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          `;
-        }
-        
-        // Construct modal body
-        recipeModalBody.innerHTML = `
-          <img src="${recipe.image}" alt="${recipe.title}" style="width: 100%; border-radius: var(--border-radius); margin-bottom: 15px;">
-          
-          ${nutritionInfo}
-          
-          <div class="recipe-meta" style="margin-bottom: 15px;">
-            <span><i class="far fa-clock"></i> ${recipe.readyInMinutes} minutes</span>
-            <span><i class="fas fa-users"></i> ${recipe.servings} servings</span>
-            ${recipe.sourceName ? `<span><i class="fas fa-globe"></i> Source: ${recipe.sourceName}</span>` : ''}
-          </div>
-          
-          <h4>Ingredients</h4>
-          ${ingredientsList}
-          
-          <h4>Instructions</h4>
-          ${instructions}
-          
-          <h4>Nutrition Facts</h4>
-          <div class="science-callout">
-            <p>This recipe contains approximately ${Math.round(calories.amount)} calories per serving with ${Math.round(protein.amount)}g of protein to support muscle recovery and growth.</p>
-            ${recipe.veryHealthy ? '<p><strong>Health Benefit:</strong> This recipe is considered very healthy by nutrition standards.</p>' : ''}
-          </div>
-        `;
-        
-      } catch (error) {
-        console.error('Error fetching recipe details:', error);
-        recipeModalBody.innerHTML = `<div class="error-message">Error loading recipe details. Please try again later.</div>`;
-      }
-    }
+        </section>
+    </div>
 
-    // Recipe modal
-    const recipeModal = document.getElementById('recipeModal');
-    const recipeModalTitle = document.getElementById('recipeModalTitle');
-    const recipeModalBody = document.getElementById('recipeModalBody');
-    const modalClose = document.querySelector('.modal-close');
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h5>Stream-AI Workout Assistant</h5>
+                    <p class="text-muted">Your personal AI-powered fitness companion for better workouts and healthier meals.</p>
+                </div>
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#home-section" class="text-decoration-none text-muted">Home</a></li>
+                        <li><a href="#workout-section" class="text-decoration-none text-muted">Workout</a></li>
+                        <li><a href="#progress-section" class="text-decoration-none text-muted">Progress</a></li>
+                        <li><a href="#nutrition-section" class="text-decoration-none text-muted">Nutrition</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Contact</h5>
+                    <p class="text-muted">Have questions or feedback? Reach out to us!</p>
+                    <p class="text-muted"><i class="fas fa-envelope me-2"></i>contact@stream-ai.com</p>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="text-center">
+                <p class="mb-0">&copy; 2023 Stream-AI Workout Assistant. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 
-    // Close modal when clicking X
-    modalClose.addEventListener('click', () => {
-      recipeModal.classList.remove('active');
-    });
+    <!-- Modal for camera permission -->
+    <div class="modal fade" id="cameraPermissionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Camera Access Required</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>To track your workout, we need access to your camera. Please allow camera access when prompted.</p>
+                    <p>Your video is processed locally and not stored unless you choose to save it.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Understood</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    // Close modal when clicking outside
-    window.addEventListener('click', (e) => {
-      if (e.target === recipeModal) {
-        recipeModal.classList.remove('active');
-      }
-    });
-    
-    // Initialize the application
-    function initApp() {
-      // Default to Workouts tab
-      document.querySelector('.tab-link[data-tab="workouts"]').click();
-      
-      // Initialize workout chart
-      const ctx = document.getElementById('progressChart').getContext('2d');
-      window.workoutChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: [],
-          datasets: [{
-            label: 'Reps Completed',
-            data: [],
-            backgroundColor: [
-              'rgba(52, 152, 219, 0.6)',
-              'rgba(46, 204, 113, 0.6)',
-              'rgba(231, 76, 60, 0.6)',
-              'rgba(155, 89, 182, 0.6)',
-              'rgba(241, 196, 15, 0.6)'
-            ],
-            borderColor: [
-              'rgba(52, 152, 219, 1)',
-              'rgba(46, 204, 113, 1)',
-              'rgba(231, 76, 60, 1)',
-              'rgba(155, 89, 182, 1)',
-              'rgba(241, 196, 15, 1)'
-            ],
-            borderWidth: 1
-          }]
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-      });
-    }
-    
-    // Initialize the application when DOM is loaded
-    document.addEventListener('DOMContentLoaded', initApp);
-  </script>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/navigation.js"></script>
+    <script src="/static/js/workout.js"></script>
+    <script src="/static/js/nutrition.js"></script>
+    <script src="/static/js/progress.js"></script>
+    <script src="/static/js/theme-switcher.js"></script>
 </body>
-</html>
+</html>="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#home-section" id="home-nav">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#workout-section" id="workout-nav">Workout</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#progress-section" id="progress-nav">Progress</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#nutrition-section" id="nutrition-nav">Nutrition</a>
+                    </li>
+                </ul>
+                <div class="ms-auto d-flex align-items-center">
+                    <!-- Dark Mode Toggle -->
+                    <div class="theme-switch-wrapper">
+                        <label class="theme-switch" for="checkbox">
+                            <input type="checkbox" id="checkbox" />
+                            <div class="slider">
+                                <i class="fas fa-sun slider-icons sun"></i>
+                                <i class="fas fa-moon slider-icons moon"></i>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <!-- Home Section -->
+        <section id="home-section" class="mb-5 section-content">
+            <div class="row align-items-center py-5">
+                <div class="col-md-12 text-center mb-4">
+                    <h1 class="display-4 fw-bold">Your AI-Powered Workout Partner</h1>
+                    <p class="lead mb-4">Get real-time form correction, track your progress, compete with others, and discover healthy recipes tailored to your preferences.</p>
+                    <a href="#workout-section" class="btn btn-primary btn-lg" id="start-training-btn">Start Training</a>
+                </div>
+            </div>
+            
+            <div class="row mt-5">
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow h-100">
+                        <div class="card-body">
+                            <h3 class="card-title"><i class="fas fa-video me-2"></i>Introduction Video</h3>
+                            <p class="card-text">Watch our introduction video to learn about all features of Stream-AI Workout Assistant.</p>
+                            <a href="https://www.youtube.com" target="_blank" class="btn btn-outline-primary">Watch Video</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow h-100">
+                        <div class="card-body">
+                            <h3 class="card-title"><i class="fas fa-bullseye me-2"></i>How It Works</h3>
+                            <p class="card-text">Stream-AI uses advanced pose detection technology to analyze your movements in real-time and provide feedback on your form.</p>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Real-time form feedback</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Progress tracking with visual charts</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Personalized workout recommendations</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Healthy recipe suggestions</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-dumbbell fa-3x mb-3 text-primary"></i>
+                            <h4>Track Multiple Exercises</h4>
+                            <p>Squats, push-ups, bicep curls, shoulder press, and lunges with perfect form.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-chart-line fa-3x mb-3 text-primary"></i>
+                            <h4>Monitor Your Progress</h4>
+                            <p>See your improvements over time with detailed charts and analytics.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-utensils fa-3x mb-3 text-primary"></i>
+                            <h4>Discover Healthy Recipes</h4>
+                            <p>Find recipes that match your available ingredients and dietary preferences.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Instructions Section -->
+        <section id="instructions-section" class="mb-5 section-content d-none">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Exercise Instructions</h2>
+                </div>
+                <div class="card-body">
+                    <h3 id="instruction-title">General Instructions</h3>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h4>Camera Setup</h4>
+                                    <ul>
+                                        <li>Position your camera at chest height</li>
+                                        <li>Ensure good lighting in the room</li>
+                                        <li>Make sure your full body is visible</li>
+                                        <li>Wear contrasting clothes to your background</li>
+                                        <li>Remove clutter from your background</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h4>Before You Start</h4>
+                                    <ul>
+                                        <li>Clear enough space around you</li>
+                                        <li>Warm up properly before exercising</li>
+                                        <li>Have water nearby</li>
+                                        <li>Select the exercise you want to perform</li>
+                                        <li>Follow the specific exercise instructions</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="exercise-specific-instructions">
+                        <!-- Squat Instructions -->
+                        <div class="exercise-instruction" data-exercise="Squats">
+                            <div class="row mt-4">
+                                <div class="col-md-7">
+                                    <h4>Squat Form Instructions</h4>
+                                    <p>Squats target your quadriceps, hamstrings, and glutes. Proper form is essential to prevent knee injuries.</p>
+                                    <h5>Camera Positioning:</h5>
+                                    <ul>
+                                        <li>Position the camera to your side for a full profile view</li>
+                                        <li>Ensure your entire body from head to feet is visible</li>
+                                        <li>Stand 6-8 feet away from the camera</li>
+                                    </ul>
+                                    <h5>Proper Form:</h5>
+                                    <ul>
+                                        <li>Stand with feet shoulder-width apart</li>
+                                        <li>Keep chest up and back straight</li>
+                                        <li>Lower until thighs are parallel to the ground</li>
+                                        <li>Keep knees tracking over toes (not caving inward)</li>
+                                        <li>Push through heels to return to starting position</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="card">
+                                        <div class="card-body text-center">
+                                            <img src="/static/img/squat-position.png" class="img-fluid rounded" alt="Squat position diagram">
+                                            <p class="mt-2"><strong>Side view is best for detecting squat depth and back angle</strong></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Push-Up Instructions -->
+                        <div class="exercise-instruction" data-exercise="Push-Ups">
+                            <div class="row mt-4">
+                                <div class="col-md-7">
+                                    <h4>Push-Up Form Instructions</h4>
+                                    <p>Push-ups target your chest, shoulders, and triceps. Proper form helps prevent wrist and shoulder strain.</p>
+                                    <h5>Camera Positioning:</h5>
+                                    <ul>
+                                        <li>Position the camera to your side for a full profile view</li>
+                                        <li>Ensure your entire body from head to feet is visible</li>
+                                        <li>Place camera about 5-6 feet away</li>
+                                    </ul>
+                                    <h5>Proper Form:</h5>
+                                    <ul>
+                                        <li>Start in plank position with hands slightly wider than shoulder-width</li>
+                                        <li>Keep body in straight line from head to heels</li>
+                                        <li>Lower chest to ground by bending elbows</li>
+                                        <li>Keep elbows at about 45° angle to your body</li>
+                                        <li>Push back up to starting position</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="card">
+                                        <div class="card-body text-center">
+                                            <img src="/static/img/pushup-position.png" class="img-fluid rounded" alt="Push-up position diagram">
+                                            <p class="mt-2"><strong>Side view is best for detecting body alignment and depth</strong></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Bicep Curl Instructions -->
+                        <div class="exercise-instruction" data-exercise="Bicep Curls">
+                            <div class="row mt-4">
+                                <div class="col-md-7">
+                                    <h4>Bicep Curl Form Instructions</h4>
+                                    <p>Bicep curls target your biceps and forearms. Proper form helps maximize muscle engagement and prevent elbow strain.</p>
+                                    <h5>Camera Positioning:</h5>
+                                    <ul>
+                                        <li>Position the camera directly in front of you</li>
+                                        <li>Ensure your upper body is fully visible</li>
+                                        <li>Stand 4-6 feet away from the camera</li>
+                                    </ul>
+                                    <h5>Proper Form:</h5>
+                                    <ul>
+                                        <li>Stand with feet shoulder-width apart</li>
+                                        <li>Keep elbows close to your sides</li>
+                                        <li>Curl weights up toward shoulders</li>
+                                        <li>Maintain controlled movement throughout</li>
+                                        <li>Lower weights back to starting position</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="card">
+                                        <div class="card-body text-center">
+                                            <img src="/static/img/bicep-position.png" class="img-fluid rounded" alt="Bicep curl position diagram">
+                                            <p class="mt-2"><strong>Front view is best for detecting elbow position and symmetry</strong></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Shoulder Press Instructions -->
+                        <div class="exercise-instruction" data-exercise="Shoulder Press">
+                            <div class="row mt-4">
+                                <div class="col-md-7">
+                                    <h4>Shoulder Press Form Instructions</h4>
+                                    <p>Shoulder presses target your deltoids, triceps, and upper chest. Proper form helps prevent shoulder injuries.</p>
+                                    <h5>Camera Positioning:</h5>
+                                    <ul>
+                                        <li>Position the camera directly in front of you</li>
+                                        <li>Ensure your entire upper body is visible</li>
+                                        <li>Stand 4-6 feet away from the camera</li>
+                                    </ul>
+                                    <h5>Proper Form:</h5>
+                                    <ul>
+                                        <li>Stand with feet shoulder-width apart</li>
+                                        <li>Hold weights at shoulder height</li>
+                                        <li>Press weights overhead until arms are fully extended</li>
+                                        <li>Keep core engaged to prevent back arching</li>
+                                        <li>Lower weights back to shoulder height</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="card">
+                                        <div class="card-body text-center">
+                                            <img src="/static/img/shoulder-position.png" class="img-fluid rounded" alt="Shoulder press position diagram">
+                                            <p class="mt-2"><strong>Front view is best for detecting arm position and shoulder alignment</strong></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Lunges Instructions -->
+                        <div class="exercise-instruction" data-exercise="Lunges">
+                            <div class="row mt-4">
+                                <div class="col-md-7">
+                                    <h4>Lunge Form Instructions</h4>
+                                    <p>Lunges target your quadriceps, hamstrings, glutes, and calves. Proper form helps prevent knee stress.</p>
+                                    <h5>Camera Positioning:</h5>
+                                    <ul>
+                                        <li>Position the camera to your side for a full profile view</li>
+                                        <li>Ensure your entire body from head to feet is visible</li>
+                                        <li>Stand 6-8 feet away from the camera</li>
+                                    </ul>
+                                    <h5>Proper Form:</h5>
+                                    <ul>
+                                        <li>Stand with feet hip-width apart</li>
+                                        <li>Step forward with one leg into a lunge position</li>
+                                        <li>Lower until both knees form 90-degree angles</li>
+                                        <li>Keep front knee aligned over ankle (not beyond toes)</li>
+                                        <li>Push through front heel to return to starting position</li>
+                                        <li>Alternate legs for each repetition</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="card">
+                                        <div class="card-body text-center">
+                                            <img src="/static/img/lunge-position.png" class="img-fluid rounded" alt="Lunge position diagram">
+                                            <p class="mt-2"><strong>Side view is best for detecting knee angles and torso position</strong></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <button id="continue-to-workout" class="btn btn-success btn-lg">Continue to Workout</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Workout Section -->
+        <section id="workout-section" class="mb-5 section-content d-none">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Live Workout</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3" id="exercise-selector">
+                        <div class="col-md-6">
+                            <label for="exercise-select" class="form-label">Choose Exercise:</label>
+                            <select id="exercise-select" class="form-select">
+                                <option value="" selected disabled>Select an exercise</option>
+                                {% for exercise in exercise_options %}
+                                <option value="{{ exercise }}">{{ exercise }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 d-flex align-items-end">
+                            <button id="start-btn" class="btn btn-success me-2">
+                                <i class="fas fa-play"></i> Start Exercise
+                            </button>
+                            <button id="end-btn" class="btn btn-danger" disabled>
+                                <i class="fas fa-stop"></i> End Exercise
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="workout-container">
+                        <div class="row">
+                            <div class="col-md-9">
+                                <div class="video-container">
+                                    <div id="camera-container" class="ratio ratio-16x9 border border-secondary rounded shadow-sm">
+                                        <video id="camera-feed" autoplay muted></video>
+                                        <img id="processed-feed" class="processed-feed d-none" alt="Processed feed">
+                                        <div id="waiting-message" class="overlay-message">
+                                            <p>Click "Start Exercise" to begin</p>
+                                        </div>
+                                        <div id="loading-spinner" class="overlay-message d-none">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Workout control buttons -->
+                                    <div id="workout-controls" class="mt-3 text-center d-none">
+                                        <button id="discard-workout-btn" class="btn btn-outline-danger me-3">
+                                            <i class="fas fa-trash"></i> Discard Workout
+                                        </button>
+                                        <button id="save-workout-btn" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Save Workout
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- New workout options -->
+                                    <div id="new-workout-options" class="mt-3 text-center d-none">
+                                        <button id="new-set-btn" class="btn btn-outline-primary me-3">
+                                            <i class="fas fa-redo"></i> New Set
+                                        </button>
+                                        <button id="new-exercise-btn" class="btn btn-success">
+                                            <i class="fas fa-dumbbell"></i> New Exercise
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stats-container h-100 p-3 border rounded shadow-sm">
+                                    <h4 class="text-center mb-3">Stats</h4>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between">
+                                            <span>Exercise:</span>
+                                            <span id="current-exercise">-</span>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between">
+                                            <span>Reps:</span>
+                                            <span id="rep-counter">0</span>
+                                        </div>
+                                        <div class="progress mt-2">
+                                            <div id="rep-progress" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between">
+                                            <span>Duration:</span>
+                                            <span id="session-duration">00:00</span>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between">
+                                            <span>Last Feedback:</span>
+                                        </div>
+                                        <div id="last-feedback" class="feedback-box mt-2">
+                                            No feedback yet
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="session-summary" class="mt-4 d-none">
+                        <h3>Workout Summary</h3>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Session Stats</h5>
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item d-flex justify-content-between">
+                                                <span>Total Reps:</span>
+                                                <span id="summary-reps">0</span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between">
+                                                <span>Average Rep Time:</span>
+                                                <span id="summary-avg-time">0s</span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between">
+                                                <span>Total Duration:</span>
+                                                <span id="summary-duration">00:00</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Feedback Summary</h5>
+                                        <ul id="feedback-list" class="list-group list-group-flush">
+                                            <li class="list-group-item text-muted">No feedback recorded</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Progress Section -->
+        <section id="progress-section" class="mb-5 section-content d-none">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Progress Tracking</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Exercise Stats</h5>
+                                    <div class="mb-3">
+                                        <label for="progress-exercise-select" class="form-label">Select Exercise:</label>
+                                        <select id="progress-exercise-select" class="form-select">
+                                            {% for exercise in exercise_options %}
+                                            <option value="{{ exercise }}">{{ exercise }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div id="progress-stats">
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between">
+                                                <span>Best Session:</span>
+                                                <span id="best-session">-</span>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between">
+                                                <span>Last Session:</span>
+                                                <span id="last-session">-</span>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between">
+                                                <span>Current Level:</span>
+                                                <span id="current-level">Beginner</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Ranking</h5>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between">
+                                            <span>Your Rank:</span>
+                                            <span class="badge bg-success">Top 15%</span>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6>Leaderboard</h6>
+                                        <ul class="list-group">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span><strong>1.</strong> JohnFit2023</span>
+                                                <span class="badge bg-primary rounded-pill">230 pts</span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span><strong>2.</strong> FitnessQueen</span>
+                                                <span class="badge bg-primary rounded-pill">215 pts</span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center bg-light">
+                                                <span><strong>3.</strong> You</span>
+                                                <span class="badge bg-success rounded-pill">198 pts</span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span><strong>4.</strong> WorkoutMaster</span>
+                                                <span class="badge bg-primary rounded-pill">175 pts</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-sm">
+                                <div class="card-header">Rep Time Distribution</div>
+                                <div class="card-body">
+                                    <div id="rep-distribution-chart" class="chart-container">
+                                        <img src="/api/progress/rep_distribution/Squats" id="dist-chart" class="img-fluid" alt="Rep Distribution Chart">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-sm">
+                                <div class="card-header">Progress Over Time</div>
+                                <div class="card-body">
+                                    <div id="progress-chart" class="chart-container">
+                                        <img src="/api/progress/history/Squats" id="history-chart" class="img-fluid" alt="Progress Chart">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Nutrition Section -->
+        <section id="nutrition-section" class="mb-5 section-content d-none">
+            <div class

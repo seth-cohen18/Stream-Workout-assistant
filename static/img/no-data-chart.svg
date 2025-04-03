@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400">
+  <!-- Background -->
+  <rect width="800" height="400" fill="#f8f9fa" rx="10" ry="10"/>
+  
+  <!-- Grid lines -->
+  <line x1="100" y1="50" x2="100" y2="320" stroke="#dee2e6" stroke-width="1"/>
+  <line x1="100" y1="320" x2="700" y2="320" stroke="#dee2e6" stroke-width="1"/>
+  
+  <!-- Y-axis ticks -->
+  <line x1="95" y1="100" x2="100" y2="100" stroke="#adb5bd" stroke-width="1"/>
+  <line x1="95" y1="180" x2="100" y2="180" stroke="#adb5bd" stroke-width="1"/>
+  <line x1="95" y1="260" x2="100" y2="260" stroke="#adb5bd" stroke-width="1"/>
+  
+  <!-- X-axis ticks -->
+  <line x1="200" y1="320" x2="200" y2="325" stroke="#adb5bd" stroke-width="1"/>
+  <line x1="300" y1="320" x2="300" y2="325" stroke="#adb5bd" stroke-width="1"/>
+  <line x1="400" y1="320" x2="400" y2="325" stroke="#adb5bd" stroke-width="1"/>
+  <line x1="500" y1="320" x2="500" y2="325" stroke="#adb5bd" stroke-width="1"/>
+  <line x1="600" y1="320" x2="600" y2="325" stroke="#adb5bd" stroke-width="1"/>
+  
+  <!-- No Data Message -->
+  <rect x="250" y="130" width="300" height="140" rx="10" ry="10" fill="#e9ecef" opacity="0.8"/>
+  <text x="400" y="180" font-family="Poppins, Arial" font-size="24" text-anchor="middle" fill="#6c757d">No Data Available</text>
+  <text x="400" y="220" font-family="Poppins, Arial" font-size="16" text-anchor="middle" fill="#6c757d">Complete a workout to see your statistics</text>
+  
+  <!-- Axes Labels -->
+  <text x="50" y="180" font-family="Poppins, Arial" font-size="14" text-anchor="middle" fill="#495057" transform="rotate(-90, 50, 180)">Reps</text>
+  <text x="400" y="360" font-family="Poppins, Arial" font-size="14" text-anchor="middle" fill="#495057">Time</text>
+</svg>

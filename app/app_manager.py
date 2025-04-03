@@ -48,6 +48,8 @@ class AppManager:
         self.last_spoken_time = 0
         self.recording = False
         self.video_writer = None
+        self.frame_count = 0
+        self.max_frames = 3000  # Limit frames to prevent memory issues (~2 minutes at 25fps)
 
     def get_profile(self):
         return self.profile
@@ -59,15 +61,23 @@ class AppManager:
             self.session_results = {"rep_times": [], "rep_count": 0, "feedback_history": []}
             self.video_frames = []
             self.previous_feedback = ""
+            self.last_spoken_time = 0
             self.recording = True
+            self.frame_count = 0
+            
+            # Announce the start of the session
+            self.tts.speak(f"Starting {exercise} tracking. Get ready!")
+            
             return True
         else:
             print(f"Invalid exercise selected: {exercise}")
             return False
 
     def process_frame(self, frame):
-        if self.recording:
+        if self.recording and self.frame_count < self.max_frames:
+            # Store a copy of the frame for video recording
             self.video_frames.append(frame.copy())
+            self.frame_count += 1
         
         if self.current_tracker is not None:
             try:
@@ -135,8 +145,8 @@ class AppManager:
             # Get frame dimensions from the first frame
             h, w, _ = self.video_frames[0].shape
             
-            # Create video writer
-            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+            # Create video writer with H.264 codec for better compatibility
+            fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # or 'avc1' for H.264 in MP4
             out = cv2.VideoWriter(filepath, fourcc, 25.0, (w, h))
             
             # Write frames to video
@@ -144,9 +154,12 @@ class AppManager:
                 out.write(frame)
             
             out.release()
+            print(f"Video saved successfully to {filepath}")
             return True, filepath
         except Exception as e:
             print(f"Error saving video: {e}")
+            import traceback
+            traceback.print_exc()
             return False, str(e)
 
     def end_session(self, save_video=True):
@@ -166,11 +179,12 @@ class AppManager:
         # Save video if requested
         video_saved = False
         video_path = ""
-        if save_video:
+        if save_video and self.video_frames:
+            self.tts.speak("Saving your workout video.")
             video_saved, video_path = self.save_workout_video()
             
         # Update profile with session data
-        if self.current_exercise:
+        if self.current_exercise and summary["total_reps"] > 0:  # Only save if reps were completed
             self.profile[self.current_exercise]["latest_reps"] = summary["total_reps"]
             
             # Store workout data with timestamp
@@ -178,7 +192,8 @@ class AppManager:
                 "date": datetime.now().isoformat(),
                 "reps": summary["total_reps"],
                 "rep_times": summary["rep_times"],
-                "video_path": video_path if video_saved else ""
+                "video_path": video_path if video_saved else "",
+                "avg_rep_time": sum(summary["rep_times"]) / len(summary["rep_times"]) if summary["rep_times"] else 0
             }
             
             self.profile[self.current_exercise]["progress"].append(workout_data)
@@ -186,6 +201,15 @@ class AppManager:
             # Save updated profile to file
             with open(self.profile_path, 'w') as f:
                 json.dump(self.profile, f, indent=2)
+                
+            # Say something encouraging if they improved
+            previous_sessions = [p for p in self.profile[self.current_exercise]["progress"][:-1] 
+                              if p.get("reps", 0) > 0]
+            if previous_sessions:
+                last_session = max(previous_sessions, key=lambda x: x["date"])
+                if summary["total_reps"] > last_session.get("reps", 0):
+                    improvement = summary["total_reps"] - last_session.get("reps", 0)
+                    self.tts.speak(f"Great job! You improved by {improvement} reps since your last workout.")
         
         # Reset recording state
         self.recording = False
